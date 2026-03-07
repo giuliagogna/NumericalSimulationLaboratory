@@ -39,7 +39,7 @@ Alternatively, to run all simulations in sequence:
 make run
 ```
 
-### Data Analysis
+### Data Analysis
 The simulation results are processed in the analysis1.ipynb notebook.
 
 Note: The raw data files (stored outputs/) are excluded from the repository to maintain a lightweight structure. The notebook contains the pre-rendered plots for immediate viewing on GitHub.
