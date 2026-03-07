@@ -16,16 +16,28 @@ The project uses a hidden `.build/` directory to store object files and executab
 
 ### Build
 To compile all exercises at once:
+```bash
 make
-
+```
 ### Execution
 You can run the exercises individually using the dedicated make targets:
-Exercise 1.1 (Mean and Variance): make run1
-Exercise 1.2 (Central Limit Theorem): make run2
-Exercise 1.3 (Buffon's Experiment): make run3
+Exercise 1.1 (Mean and Variance): 
+```bash
+make run1
+```
+Exercise 1.2 (Central Limit Theorem): 
+```bash
+make run2
+```
+Exercise 1.3 (Buffon's Experiment): 
+```bash
+make run3
+```
 
 Alternatively, to run all simulations in sequence:
+```bash
 make run
+```
 
 ### Data Analysis
 The simulation results are processed in the analysis1.ipynb notebook.
