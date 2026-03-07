@@ -7,7 +7,7 @@ This directory contains the C++ implementation and data analysis for the first l
 - `exercise01-1.cpp`, `exercise01-2.cpp`, `exercise01-3.cpp`: main source files for the three exercises.
 - `random/`: specialized library for random number generation (provided).
 - `auxiliary_functions/`: custom helper functions.
-- `analysis.ipynb`: Jupyter Notebook containing the data analysis and visualization.
+- `analysis1.ipynb`: Jupyter Notebook containing the data analysis and visualization.
 - `Makefile`: automated build system for compilation and execution.
 
 ## Compilation and Usage
