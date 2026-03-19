@@ -3,6 +3,7 @@
 
 #include "../../utils/auxiliary_functions/functions.h"
 #include "../../utils/random/random.h"
+#include "../../utils/pricing_options/pricing_options.h"
 
 #include <iostream>
 #include <fstream>
@@ -19,9 +20,9 @@ int main() {
     int L = M/N;            // Number of throws in each block
     int time_steps = 100;   // Number of time steps in the discretized path
 
-    ofstream output_direct;
-    OpenOutputFile(output_direct, "output_trajectory_03.dat");
-    output_direct << "#Throws Call_price Error_Call Put_Price Error_Price" << endl;
+    ofstream output_trajectory;
+    OpenOutputFile(output_trajectory, "output_trajectory_03.dat");
+    output_trajectory << "#Throws Call_price Error_Call Put_Price Error_Price" << endl;
 
     // Data of the GBM process
     double S0 = 100.0;     // Asset price
@@ -36,6 +37,9 @@ int main() {
     double current_progressive_put = 0.0;
     double current_progressive_put_squared = 0.0;
 
+    double call_error = 0.0;
+    double put_error = 0.0;
+
 
     for (int i=0; i<N; i++){
 
@@ -43,7 +47,7 @@ int main() {
         double put_sum = 0.0;
 
         for (int j=0; j<L; j++){
-            
+
             double S = S0;
 
             for(int t=0; t<time_steps; t++){
@@ -67,21 +71,25 @@ int main() {
         current_progressive_put = (double(i)/(i+1)) * current_progressive_put + current_put/double(i+1);
         current_progressive_put_squared = (double(i)/(i+1)) * current_progressive_put_squared + current_put_squared/double(i+1);
 
-        double call_error = error(current_progressive_call, current_progressive_call_squared, i);
-        double put_error = error(current_progressive_put, current_progressive_put_squared, i);
+        call_error = error(current_progressive_call, current_progressive_call_squared, i);
+        put_error = error(current_progressive_put, current_progressive_put_squared, i);
 
-        output_direct << current_throws(i, L) << " " 
+        output_trajectory << current_throws(i, L) << " " 
                       << current_progressive_call << " "
                       << call_error << " " 
                       << current_progressive_put << " " 
                       << put_error << endl;
 
     }
+    
+    cout << "Call price predicted = " << current_progressive_call << " +/- " << call_error << endl;
+    cout << "Call price expected = " << BlackScholes(S0, K, T, r, sigma)[0] << endl;
 
-    cout << "Put price = " << current_progressive_put << endl;
-    cout << "Call price = " << current_progressive_call << endl;
+    cout << "Put price simulated = " << current_progressive_put << " +/- " << put_error << endl;
+    cout << "Put price expected = " << BlackScholes(S0, K, T, r, sigma)[1] << endl;
 
-    output_direct.close();
+
+    output_trajectory.close();
 
     return 0;
 }

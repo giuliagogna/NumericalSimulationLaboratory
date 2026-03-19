@@ -3,6 +3,7 @@
 
 #include "../../utils/auxiliary_functions/functions.h"
 #include "../../utils/random/random.h"
+#include "../../utils/pricing_options/pricing_options.h"
 
 #include <iostream>
 #include <fstream>
@@ -35,6 +36,9 @@ int main() {
     double current_progressive_put = 0.0;
     double current_progressive_put_squared = 0.0;
 
+    double call_error = 0.0;
+    double put_error = 0.0;
+
 
     for (int i=0; i<N; i++){
 
@@ -60,8 +64,8 @@ int main() {
         current_progressive_put = (double(i)/(i+1)) * current_progressive_put + current_put/double(i+1);
         current_progressive_put_squared = (double(i)/(i+1)) * current_progressive_put_squared + current_put_squared/double(i+1);
 
-        double call_error = error(current_progressive_call, current_progressive_call_squared, i);
-        double put_error = error(current_progressive_put, current_progressive_put_squared, i);
+        call_error = error(current_progressive_call, current_progressive_call_squared, i);
+        put_error = error(current_progressive_put, current_progressive_put_squared, i);
 
         output_direct << current_throws(i, L) << " " 
                       << current_progressive_call << " "
@@ -71,8 +75,11 @@ int main() {
 
     }
 
-    cout << "Put price = " << current_progressive_put << endl;
-    cout << "Call price = " << current_progressive_call << endl;
+    cout << "Call price predicted = " << current_progressive_call << " +/- " << call_error << endl;
+    cout << "Call price expected = " << BlackScholes(S0, K, T, r, sigma)[0] << endl;
+
+    cout << "Put price simulated = " << current_progressive_put << " +/- " << put_error << endl;
+    cout << "Put price expected = " << BlackScholes(S0, K, T, r, sigma)[1] << endl;
 
     output_direct.close();
 
