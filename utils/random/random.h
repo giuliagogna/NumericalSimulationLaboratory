@@ -40,6 +40,11 @@ public:
   double Exp(double lambda);
   // Method to generate a random number with a Lorentzian distribution
   double Lorentz(double mean, double gamma);
+
+
+
+  // ===================== Method required for excercise 02.1 =====================
+  double distr_importance(double x);
   
 };
 

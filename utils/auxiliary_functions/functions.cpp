@@ -12,13 +12,13 @@ using namespace std;
 void InitializeGenerator(Random &rnd){
     int seed[4];
     int p1, p2;
-    ifstream Primes("random/Primes");
+    ifstream Primes("../utils/random/Primes");
     if (Primes.is_open()){
        Primes >> p1 >> p2 ;
     } else cerr << "PROBLEM: Unable to open Primes" << endl;
     Primes.close();
  
-    ifstream input("random/seed.in");
+    ifstream input("../utils/random/seed.in");
     string property;
     if (input.is_open()){
        while ( !input.eof() ){
@@ -65,4 +65,4 @@ double error(double AV, double AV2, int n){
 // This function computes the number of throws at the i-th block, given the total number of throws L
 int current_throws(int i, int L){
     return (i + 1) * L;
-} 
+}

@@ -3,10 +3,12 @@
 #include <string>
 #include <vector>
 
-#include "random/random.h"
-#include "auxiliary_functions/functions.h"
+#include "../../utils/random/random.h"
+#include "../../utils/auxiliary_functions/functions.h"
 
 using namespace std;
+
+const string directory = "Lab01";
 
 int main(){
 

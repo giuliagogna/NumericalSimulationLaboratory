@@ -82,7 +82,15 @@ double Random :: Lorentz(double mean, double gamma){
    return mean + gamma*tan(M_PI*(r-0.5));
 }
 
+// ===================== Method required for excercise 02.1 =====================
 
+double Random :: distr_importance(double x){
+   // This function generates a random number from the distribution used for importance sampling in exercise 02.1
+   // The distribution is d(x) = 2*(1-x) in the interval [0,1): with the inverse transform method, the random number can be generated as x = 1 - sqrt(1-r), where r is a random number uniformly distributed in the interval [0,1)
+   
+   double r=Rannyu();
+   return 1 - sqrt(1-r);
+}
 
 
 // Seed and configuration

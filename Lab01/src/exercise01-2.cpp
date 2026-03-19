@@ -1,5 +1,5 @@
-#include "random/random.h"
-#include "auxiliary_functions/functions.h"
+#include "../../utils/random/random.h"
+#include "../../utils/auxiliary_functions/functions.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
