@@ -82,7 +82,7 @@ int main() {
 
     }
     
-    cout << "Call price predicted = " << current_progressive_call << " +/- " << call_error << endl;
+    cout << "Call price simulated = " << current_progressive_call << " +/- " << call_error << endl;
     cout << "Call price expected = " << BlackScholes(S0, K, T, r, sigma)[0] << endl;
 
     cout << "Put price simulated = " << current_progressive_put << " +/- " << put_error << endl;

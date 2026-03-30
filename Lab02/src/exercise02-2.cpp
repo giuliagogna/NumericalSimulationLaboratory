@@ -18,10 +18,10 @@ int main(){
     output << "#step r_squared_lattice error_lattice r_squared_continuous error_continuous" << endl;
 
     int M = 100000;              // Total number of random walks
-    int N = 100;                // Number of blocks for averaging 
-    int L = M / N;              // Number of random walks in each block
-    int n_steps = 100;          // Number of steps in each random walk 
-    float step_length = 1.0;    // Length of each step in the random walk
+    int N = 100;                 // Number of blocks for averaging 
+    int L = M / N;               // Number of random walks in each block
+    int n_steps = 100;           // Number of steps in each random walk 
+    float step_length = 1.0;     // Length of each step in the random walk
 
     // Vectors to store the progressive averages and their squares for error calculation
     vector<double> prog_lattice(n_steps, 0.0);
