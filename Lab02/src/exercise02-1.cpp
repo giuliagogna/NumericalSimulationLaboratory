@@ -14,6 +14,8 @@ double importance_integrand(double x){
     return M_PI/4.0*cos(M_PI*x/2.0)/(1-x);
 };
 
+//FIXME: use data blocking class instead of calculating the progressive mean and error by hand
+
 int main(){
 
     Random rnd;

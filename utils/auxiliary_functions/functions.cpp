@@ -15,6 +15,8 @@ void InitializeGenerator(Random &rnd){
     ifstream Primes("../utils/random/Primes");
     if (Primes.is_open()){
        Primes >> p1 >> p2 ;
+//       Primes >> p1 >> p2 ;
+//       Primes >> p1 >> p2 ;
     } else cerr << "PROBLEM: Unable to open Primes" << endl;
     Primes.close();
  
