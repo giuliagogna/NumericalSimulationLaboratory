@@ -37,21 +37,17 @@ int main() {
         OpenOutputFile(output_2p_r, filename2p);
         output_2p_r << "# r" << endl;
 
-        Position pos1s = {50.0, 50.0, 50.0};
-        Position pos2p = {50.0, 50.0, 50.0};
+        Position pos1s = {1.0, 1.0, 1.0};
+        Position pos2p = {1.0, 1.0, 1.0};
         
-        MetropolisAlgorithm<Psi100> metropolis100(psi_1s, dist_type);
-        MetropolisAlgorithm<Psi210> metropolis210(psi_2p, dist_type);
+        MetropolisAlgorithm<Psi100> metropolis100(psi_1s, pos1s, dist_type);
+        MetropolisAlgorithm<Psi210> metropolis210(psi_2p, pos2p, dist_type);
 
         metropolis100.tune_step(pos1s, rnd, 1.0);
         metropolis210.tune_step(pos2p, rnd, 1.0);
 
-        pos1s = {50.0, 50.0, 50.0}; // Reset to starting point
-        pos2p = {50.0, 50.0, 50.0}; // Reset to starting point
-
-//        int n_equilibration_steps = 20000; // Number of steps for equilibration
-//        metropolis100.equilibrate(pos1s, n_equilibration_steps, rnd);
-//        metropolis210.equilibrate(pos2p, n_equilibration_steps, rnd);
+        metropolis100.reset_position(pos1s); 
+        metropolis210.reset_position(pos2p);
 
         cout << "Generating raw data..." << endl;
         for(int i = 0; i < N_steps; i++) {

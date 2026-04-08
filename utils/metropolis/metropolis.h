@@ -64,8 +64,9 @@ private:
     double _step = 0.5;
     string _tentative_distr = "uniform";
     int _accepted_moves = 0;
+    Position _initial_position;
 
-    // Tentative move function (Moved INSIDE as a private method)
+    // Tentative move function
     Position tentative_move(Position p, Random& rnd) {
         if (_tentative_distr == "uniform") {
             p.x += _step * (rnd.Rannyu() - 0.5) * 2.0; 
@@ -84,10 +85,11 @@ private:
 
 public:
     // Constructor initializes the probability distribution
-    MetropolisAlgorithm(Distribution p, string tentative_distr_name = "uniform", double initial_step=0.5) : prob(p) {
+    MetropolisAlgorithm(Distribution p, Position initial_position, string tentative_distr_name = "uniform", double initial_step=0.5) : prob(p) {
         _tentative_distr = tentative_distr_name;
         _step = initial_step;
         _accepted_moves = 0;
+        _initial_position = initial_position;
     }
 
     double get_step() const {
@@ -108,6 +110,10 @@ public:
 
     int get_accepted_moves(){
         return _accepted_moves;
+    }
+
+    void reset_position(Position& p) const {
+        p = _initial_position;
     }
 
     // Acceptance function
@@ -147,7 +153,7 @@ public:
         
         double current_acc = 0.0;
         
-        std::cout << "\nStarting calibration for distribution:" << _tentative_distr << "\n" << std::endl;
+        std::cout << "\nStarting calibration for distribution: " << _tentative_distr << "\n" << std::endl;
 
         while (true) {
 
@@ -185,7 +191,7 @@ public:
 
     // Equilibration
 
-    void equilibrate(Position p, int n_equilibration, Random rnd){
+    void equilibrate(Position& p, int& n_equilibration, Random& rnd){
         std::cout << "Starting equilibration phase ..." << std::endl;
 
         for(int i = 0; i < n_equilibration; i++) {

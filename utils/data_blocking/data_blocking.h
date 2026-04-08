@@ -5,70 +5,70 @@
 
 class DataBlocker {
 private:
-    int L;                  // Block size
-    int current_step;       // Step counter within the current block
-    int completed_blocks;   // Number of completed blocks
+    int _L;                  // Block size
+    int _current_step;       // Step counter within the current block
+    int _completed_blocks;   // Number of completed blocks
 
-    double current_block_sum; // Sum of measurements in the current block
-    double prog_mean;         // Progressive mean up to the current block
-    double prog_mean_sq;      // Progressive mean squared up to the current block
+    double _current_block_sum; // Sum of measurements in the current block
+    double _prog_mean;         // Progressive mean up to the current block
+    double _prog_mean_sq;      // Progressive mean squared up to the current block
 
 public:
     // Constructor initializes the block size and resets all counters and sums
     DataBlocker(int block_size) : 
-        L(block_size), 
-        current_step(0), 
-        completed_blocks(0),
-        current_block_sum(0.0), 
-        prog_mean(0.0), 
-        prog_mean_sq(0.0) {}
+        _L(block_size), 
+        _current_step(0), 
+        _completed_blocks(0),
+        _current_block_sum(0.0), 
+        _prog_mean(0.0), 
+        _prog_mean_sq(0.0) {}
 
     // Adds a single measurement to the current block and updates the block sum and step counter
     void add_measurement(double value) {
-        current_block_sum += value;
-        current_step++;
+        _current_block_sum += value;
+        _current_step++;
 
-        if (current_step == L) {
+        if (_current_step == _L) {
             close_block();
         }
     }
 
     // Closes the block and updates statistics
     void close_block() {
-        double block_mean = current_block_sum / L;
-        double n = completed_blocks + 1.0; 
+        double block_mean = _current_block_sum / _L;
+        double n = _completed_blocks + 1.0; 
 
-        prog_mean = ((n - 1.0) / n) * prog_mean + block_mean / n;
-        prog_mean_sq = ((n - 1.0) / n) * prog_mean_sq + (block_mean * block_mean) / n;
+        _prog_mean = ((n - 1.0) / n) * _prog_mean + block_mean / n;
+        _prog_mean_sq = ((n - 1.0) / n) * _prog_mean_sq + (block_mean * block_mean) / n;
 
-        completed_blocks++;
-        current_step = 0;
-        current_block_sum = 0.0;
+        _completed_blocks++;
+        _current_step = 0;
+        _current_block_sum = 0.0;
     }
 
     // Returns the current number of throws processed up to the current block
     int get_current_throws() const {
-        return completed_blocks * L;
+        return _completed_blocks * _L;
     }
 
     // Returns the number of completed blocks
     int get_completed_blocks() const {
-        return completed_blocks;
+        return _completed_blocks;
     }
 
     // Returns the statistical uncertainty of the progressive mean
     double get_error() const {
-        if (completed_blocks <= 1) return 0.0; 
+        if (_completed_blocks <= 1) return 0.0; 
         
-        double variance = prog_mean_sq - (prog_mean * prog_mean);
+        double variance = _prog_mean_sq - (_prog_mean * _prog_mean);
         if (variance < 0.0) return 0.0; // Avoid floating-point approximation issues
         
-        return std::sqrt(variance / (completed_blocks - 1.0));
+        return std::sqrt(variance / (_completed_blocks - 1.0));
     }
 
     // Estimate of the mean up to the current block
     double get_mean() const { 
-        return prog_mean; 
+        return _prog_mean; 
     }
 };
 

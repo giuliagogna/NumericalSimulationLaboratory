@@ -17,9 +17,33 @@ int main() {
     InitializeGenerator(rnd);
 
     // DATA BLOCKING CONFIGURATION
-    int N = 1000000;       // Total number of steps
-    int n_blocks = 100;    // Number of blocks for data blocking
-    int L = N / n_blocks;  // Number of steps in each block
+
+    string input_filename = "src/autocorrelation/config.txt"; 
+
+    ifstream config(input_filename);
+    if (!config) {
+        cerr << "Error: Could not open configuration file: " << input_filename << endl;
+        cerr << "Did you run the Python pipeline in autocorrelation/ first?" << endl;
+        return 1;
+    }
+
+    string label;
+    int n_equilibration_steps = 0;
+    int L = 0;
+    int n_blocks = 0;
+    int N = 0;
+
+    config >> label >> n_equilibration_steps;
+    config >> label >> L;
+    config >> label >> n_blocks;
+    config >> label >> N;
+
+    cout << "\n=== CONFIGURATION LOADED AUTOMATICALLY ===" << endl;
+    cout << " - Equilibration steps: " << n_equilibration_steps << endl;
+    cout << " - Block Length (L):    " << L << endl;
+    cout << " - Number of Blocks:    " << n_blocks << endl;
+    cout << " - Total Steps (N):     " << N << endl;
+    cout << "==========================================\n" << endl;
 
     // INITIALIZE WAVEFUNCTIONS
     Psi100 psi_1s;                      
@@ -60,10 +84,10 @@ int main() {
 
         // INITIALIZE ALGORITHMS AND POSITIONS
         Position pos1s = {1.0, 1.0, 1.0};
-        Position pos2p = {3.0, 3.0, 3.0};
+        Position pos2p = {1.0, 1.0, 1.0};
         
-        MetropolisAlgorithm<Psi100> metropolis100(psi_1s, dist_type);
-        MetropolisAlgorithm<Psi210> metropolis210(psi_2p, dist_type);
+        MetropolisAlgorithm<Psi100> metropolis100(psi_1s, pos1s, dist_type);
+        MetropolisAlgorithm<Psi210> metropolis210(psi_2p, pos2p, dist_type);
 
         // TUNING
 
@@ -74,12 +98,10 @@ int main() {
         cout << "Optimal step found for Psi210 (" << dist_type << "): " << metropolis210.get_step() << endl;
 
         // EQUILIBRATION
-        int n_equilibration_steps = 50000; // Number of steps for equilibration
+        metropolis100.reset_position(pos1s);
+        metropolis210.reset_position(pos2p);
 
-        pos1s = {1.0, 1.0, 1.0}; // Reset to starting point
         metropolis100.equilibrate(pos1s, n_equilibration_steps, rnd);
-
-        pos2p = {3.0, 3.0, 3.0}; // Reset to starting point
         metropolis210.equilibrate(pos2p, n_equilibration_steps, rnd);
 
         // STARTING SIMULATION
