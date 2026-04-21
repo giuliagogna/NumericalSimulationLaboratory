@@ -85,8 +85,33 @@ double System :: Force(int i, int dim){ // Calculates the force acting on partic
 
 void System :: move(int i){ // Propose a MC move for particle i
   if(_sim_type == 3){ //Gibbs sampler for Ising
-    // TO BE FIXED IN EXERCISE 6
-  } else {           // M(RT)^2
+
+    // ===================================
+    // EX 6) GIBBS SAMPLER FOR ISING 1D
+    // ===================================
+
+    int left_spin = _particle(this->pbc(i-1)).getspin();
+    int right_spin = _particle(this->pbc(i+1)).getspin();
+
+    // Calculate the energy difference between the state with spin i +1 and the state with spin i -1
+    double delta_E_minus_to_plus = 2.0 * (_J * (left_spin + right_spin) + _H);
+
+    // Conditional probability of spin i being +1 given the states of its neighbors
+    double p_plus = 1.0 / (1.0 + exp(-(_beta) * delta_E_minus_to_plus));
+
+    double r = _rnd.Rannyu();
+
+    if(r < p_plus){
+      _particle(i).setspin(+1);
+    } else {
+      _particle(i).setspin(-1);
+    }
+
+    // Increment accepted moves every time, because Gibbs ALWAYS accepts the proposed state
+    _naccepted++;
+
+
+  } else {                    // M(RT)^2
     if(_sim_type == 1){       // LJ system
       vec shift(_ndim);       // Will store the proposed translation
       for(int j=0; j<_ndim; j++){
@@ -674,12 +699,42 @@ void System :: measure(){ // Measure properties
   if (_measure_temp and _measure_kenergy) _measurement(_index_temp) = (2.0/3.0) * kenergy_temp;
   // PRESSURE //////////////////////////////////////////////////////////////////
   if (_measure_pressure) _measurement[_index_pressure] = _rho * (2.0/3.0) * kenergy_temp + (_ptail*_npart + 48.0*virial/3.0)/_volume;
+
+  // ========================================================================================
+  // EX 6) CALCULATION OF MAGNETIZATION, SPECIFIC HEAT AND SUSCEPTIBILITY FOR ISING MODEL
+  // ========================================================================================
+
   // MAGNETIZATION /////////////////////////////////////////////////////////////
-// TO BE FIXED IN EXERCISE 6
+  // Mean of the spin of all particles
+  if (_measure_magnet){
+
+    for(int i=0; i<_npart; i++){
+      magnetization += _particle(i).getspin();
+    }
+    magnetization /= double(_npart);
+
+    _measurement(_index_magnet) = magnetization;
+  }
+
   // SPECIFIC HEAT /////////////////////////////////////////////////////////////
-// TO BE FIXED IN EXERCISE 6
+  if (_measure_cv){
+    // Save the square of the internal energy per particle (H/N)^2. 
+    // tenergy_temp contains H/N (calculated above)
+    _measurement(_index_cv) = tenergy_temp * tenergy_temp; // sum of (H/N)^2
+  }
+
   // SUSCEPTIBILITY ////////////////////////////////////////////////////////////
-// TO BE FIXED IN EXERCISE 6
+  // Use only the mean squared of the spins ignoring the simple mean of spins because we only want the case of h=0
+  if (_measure_chi){
+
+    double sum_s = 0.0;
+    for(int i=0; i<_npart; i++){
+      sum_s += _particle(i).getspin();
+    }
+
+    _measurement(_index_chi) = _beta * (sum_s * sum_s)/double(_npart);
+
+  }
 
   _block_av += _measurement; //Update block accumulators:_block_av is a vector of size _nprop, each component is the sum of the measurements of that property over the current block
 
@@ -692,6 +747,14 @@ void System :: averages(int blk){
   double average, sum_average, sum_ave2;
 
   _average     = _block_av / double(_nsteps);
+  
+    // _average(_index_cv) contains < (H/N)^2 > for this block
+    // _average(_index_tenergy) contains < H/N > for this block
+    // C_v/N = beta^2 * N * ( <(H/N)^2> - <H/N>^2 )
+  if (_measure_cv) {
+    _average(_index_cv) = pow(_beta, 2) * double(_npart) * (_average(_index_cv) - pow(_average(_index_tenergy), 2));
+  }
+
   _global_av  += _average;
   _global_av2 += _average % _average; // % -> element-wise multiplication
 
@@ -813,11 +876,46 @@ void System :: averages(int blk){
 
 
   // MAGNETIZATION /////////////////////////////////////////////////////////////
-  // TO BE FIXED IN EXERCISE 6
+  if(_measure_magnet){
+    coutf.open("../OUTPUT/magnetization.dat",ios::app);
+    average  = _average(_index_magnet);
+    sum_average = _global_av(_index_magnet);
+    sum_ave2 = _global_av2(_index_magnet);
+    coutf << setw(12) << blk
+          << setw(12) << average
+          << setw(12) << sum_average/double(blk)
+          << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
+    coutf.close();
+  }
   // SPECIFIC HEAT /////////////////////////////////////////////////////////////
-  // TO BE FIXED IN EXERCISE 6
+
+  if (_measure_cv) {
+    coutf.open("../OUTPUT/specific_heat.dat",ios::app);
+    average = _average(_index_cv); // now contains the specific heat: can operate directly on this
+    sum_average = _global_av(_index_cv);
+    sum_ave2 = _global_av2(_index_cv);
+    coutf << setw(12) << blk
+          << setw(12) << average
+          << setw(12) << sum_average/double(blk)
+          << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
+    coutf.close();
+
+
+  }
+
   // SUSCEPTIBILITY ////////////////////////////////////////////////////////////
-  // TO BE FIXED IN EXERCISE 6
+  if(_measure_chi){
+    coutf.open("../OUTPUT/susceptibility.dat",ios::app);
+    average  = _average(_index_chi);
+    sum_average = _global_av(_index_chi);
+    sum_ave2 = _global_av2(_index_chi);
+    coutf << setw(12) << blk
+          << setw(12) << average
+          << setw(12) << sum_average/double(blk)
+          << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
+    coutf.close();
+  }
+
   // ACCEPTANCE ////////////////////////////////////////////////////////////////
   double fraction;
   coutf.open("../OUTPUT/acceptance.dat",ios::app);
