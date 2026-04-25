@@ -439,6 +439,14 @@ void System :: initialize_properties(){ // Initialize data members used for meas
         ofstream coutgr("../OUTPUT/gofr.dat");
         coutgr << "# DISTANCE:     AVE_GOFR:        ERROR:" << endl;
         coutgr.close();
+
+        // ==========================================================
+        // Add new file to store values of actual GOFR in each block
+        ofstream coutgr_blocks("../OUTPUT/gofr_blocks.dat");
+        coutgr_blocks << "# BLOCK:        DISTANCE:     ACTUAL_GOFR:" << endl;
+        coutgr_blocks.close();
+        // ==========================================================
+
         input>>_n_bins;
         _nprop+=_n_bins;
         _bin_size = (_halfside.min() )/(double)_n_bins;
@@ -651,13 +659,33 @@ void System :: measure(){ // Measure properties
         distance(1) = this->pbc( _particle(i).getposition(1,true) - _particle(j).getposition(1,true), 1);
         distance(2) = this->pbc( _particle(i).getposition(2,true) - _particle(j).getposition(2,true), 2);
         dr = sqrt( dot(distance,distance) );
-        // ===================================================================================================================
-        // GOFR ... TO BE FIXED IN EXERCISE 7
+
+        // ========================================================================================
+        // EX 7) CALCULATION OF DISTRIBUTION FUNCTION GOFR FOR LENNARD-JONES FLUID
+        // ========================================================================================
+        if(_measure_gofr){
+          if(dr < _halfside.min()){ // We consider only distances smaller than half the box side, because of periodic boundary conditions
+            bin = int(dr/_bin_size);
+            if (bin < _n_bins) _measurement(_index_gofr + bin) += 2.0; // here I store the row countings
+          }
+        }
+
         if(dr < _r_cut){
           if(_measure_penergy)  penergy_temp += 1.0/pow(dr,12) - 1.0/pow(dr,6); // POTENTIAL ENERGY
           if(_measure_pressure) virial       += 1.0/pow(dr,12) - 0.5/pow(dr,6); // PRESSURE
         }
         // ===================================================================================================================
+      }
+    }
+
+    // Normalization of GOFR
+    if(_measure_gofr){
+      for (int i=0; i<_n_bins; i++){
+        double r_low = i * _bin_size;
+        double r_up = (i+1) * _bin_size;
+        double deltaV = (4.0/3.0) * M_PI * (pow(r_up, 3) - pow(r_low, 3));
+        // Modify _measurement before adding it to block average, because we want to store the normalized GOFR, not the row countings
+        _measurement(_index_gofr + i) /= (_rho * _npart * deltaV); 
       }
     }
   }
@@ -820,8 +848,38 @@ void System :: averages(int blk){
           << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
     coutf.close();
   }
+
   // GOFR //////////////////////////////////////////////////////////////////////
-  // TO BE FIXED IN EXERCISE 7
+  if (_measure_gofr){
+    // Not used in exercise 7: never asked to plot the actual values of the gofr -> commented
+    /*coutf.open("../OUTPUT/gofr_blocks.dat",ios::app);
+
+    for(int i=0; i<_n_bins; i++){
+      double distance = (i + 0.5) * _bin_size; // get center of bin
+
+      average = _average(_index_gofr + i);
+
+      coutf << setw(12) << blk
+            << setw(12) << distance
+            << setw(12) << average << endl;
+    }
+    coutf.close();*/
+
+    // Saves final block with statistical uncertainty
+    if(blk == _nblocks){
+      coutf.open("../OUTPUT/gofr.dat", ios::app);
+      for(int i=0; i<_n_bins; i++){
+        double distance = (i + 0.5) * _bin_size;
+        sum_average = _global_av(_index_gofr + i);
+        sum_ave2 = _global_av2(_index_gofr + i);
+
+        coutf << setw(12) << distance
+              << setw(12) << sum_average/double(blk)
+              << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
+      }
+      coutf.close();
+    }
+  }
 
   // POFV ///////////////////////////////////////////////////////
   // ============================================================================================================================
