@@ -45,6 +45,9 @@ public:
     void SaveBestTour(const string& filename) {
         _pop[0].save_tour(filename);
     }
+
+    // Save the entire population's fitness and individuals
+    void SavePopulationLog(ofstream& out_file, int generation) const;
 };
 
 #endif // POPULATION_H

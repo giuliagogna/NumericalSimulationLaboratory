@@ -42,7 +42,7 @@ void OpenOutputFile(ofstream& output_file, const string& filename) {
         std::filesystem::create_directory("outputs");
     }
     
-    string filepath = "outputs/" + filename;
+    string filepath = "outputs/" + string(filename);
     
     output_file.open(filepath);
     

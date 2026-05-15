@@ -1,6 +1,8 @@
 #include "Population.h"
+#include "../../utils/auxiliary_functions/functions.h"
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 
@@ -30,6 +32,7 @@ vector<int> Population::GenerateRandomTour() {
         int j = 1 + static_cast<int>(r * i); 
         swap(idxs[i], idxs[j]); 
     }
+
     return idxs;
 }
 
@@ -54,7 +57,6 @@ int Population::Select() {
 
     // To ensure the index is never out of bouds
     if(j >= _pop_size) { 
-        cout << "Unexpected generator result! INDEX IN POPULATION BIGGER THAT NUNBER OF ELEMENTS IN POPULATION" << endl;
         j = _pop_size - 1; 
     }
     
@@ -137,7 +139,61 @@ void Population::MutateBlockSwap(vector<int>& child_idxs) {
 
 //  CROSSOVER
 
-// Before adding the crossover, check if the genetic operators perform well
+void Population::Crossover(const vector<int>& parent1, const vector<int>& parent2, vector<int>& child1, vector<int>& child2) {
+    int size = parent1.size();
+
+    // random cut position: avoid index 0 (city 1) and the last index (also city 1)
+    int cut = static_cast<int>(_rnd.Rannyu(1, size - 1));
+
+    // conserve the first part of the paths by copying the parents into the children
+    child1 = parent1;
+    child2 = parent2;
+
+    // complete the paths with missing cities in the other parent's order
+    int insert_idx1 = cut;
+    int insert_idx2 = cut;
+
+    // iterate through the parents from left to right (skipping index 0)
+    for (int i = 1; i < size; i++) {
+        
+        // process child 1 using parent 2 order
+        int candidate1 = parent2[i];
+        bool found1 = false;
+        
+        // check if candidate1 is already in the conserved part of child1
+        for (int j = 1; j < cut; j++) {
+            if (child1[j] == candidate1) {
+                found1 = true;
+                break;
+            }
+        }
+        
+        // if it was not in the conserved part, it's a missing city, so add it
+        if (!found1 && insert_idx1 < size) {
+            child1[insert_idx1] = candidate1;
+            insert_idx1++;
+        }
+
+
+        // process child 2 using parent 1 order
+        int candidate2 = parent1[i];
+        bool found2 = false;
+        
+        // Check if candidate2 is already in the conserved part of child2
+        for (int j = 1; j < cut; j++) {
+            if (child2[j] == candidate2) {
+                found2 = true;
+                break;
+            }
+        }
+        
+        // if it was not in the conserved part, it's a missing city, so add it
+        if (!found2 && insert_idx2 < size) {
+            child2[insert_idx2] = candidate2;
+            insert_idx2++;
+        }
+    }
+}
 
 // ========================================
 // EVOLUTIONARY ENGINE
@@ -145,29 +201,73 @@ void Population::MutateBlockSwap(vector<int>& child_idxs) {
 
 void Population::EvolveOneGeneration(){
 
-    SortByFitness(); // Sort the population by fitness before applying selection and mutation
-
     vector<Individual> new_population;
 
-    // Select an individual
-    for(int i = 0; i < _pop_size; i++){
-        //cout << "Evolving individual " << i+1 << "/" << _pop_size << endl; // Progress indicator
+    // Increment by two individual per cycle: crossover takes in two parents and produces two children, so at each iteration 
+    // I make two processings. At the end of the cycle _pop_size processings have been done
+    for(int i = 0; i < _pop_size; i += 2){
         
+        // Select two parents
+        int p1_idx = Select();
+        int p2_idx = Select();
+        
+        vector<int> parent1 = _pop[p1_idx].get_individual();
+        vector<int> parent2 = _pop[p2_idx].get_individual();
 
-        int individual_index = Select();
-        vector<int> selected_individual = _pop[individual_index].get_individual();
+        // Vectors that will host the children: they will be filled by the crossover function, but they need to be defined here to be passed as arguments
+        vector<int> child1, child2;
+        
+        // Probability of crossover
+        double p_Crossover = 0.65; 
 
+        // Apply Crossover
+        if(_rnd.Rannyu() < p_Crossover) {
+            Crossover(parent1, parent2, child1, child2);
+        } else {
+            // If crossover does not trigger, the children are exact clones of the parents
+            child1 = parent1;
+            child2 = parent2;
+        }
+
+        // Apply mutations independently for the two children
         double p_Mutation = 0.07;
 
-        if(_rnd.Rannyu() < p_Mutation) MutatePairPermutation(selected_individual);
-        if(_rnd.Rannyu() < p_Mutation) MutateShift(selected_individual);
-        if(_rnd.Rannyu() < p_Mutation) MutateInversion(selected_individual);
-        if(_rnd.Rannyu() < p_Mutation) MutateBlockSwap(selected_individual);
+        if(_rnd.Rannyu() < p_Mutation) MutatePairPermutation(child1);
+        if(_rnd.Rannyu() < p_Mutation) MutateShift(child1);
+        if(_rnd.Rannyu() < p_Mutation) MutateInversion(child1);
+        if(_rnd.Rannyu() < p_Mutation) MutateBlockSwap(child1);
 
-        new_population.push_back(Individual(selected_individual, _coords));
+        if(_rnd.Rannyu() < p_Mutation) MutatePairPermutation(child2);
+        if(_rnd.Rannyu() < p_Mutation) MutateShift(child2);
+        if(_rnd.Rannyu() < p_Mutation) MutateInversion(child2);
+        if(_rnd.Rannyu() < p_Mutation) MutateBlockSwap(child2);
 
+        // The children get added to the new population: add both
+        // I added a safety check in the main: if the population size provided is odd, the program gives error
+        new_population.push_back(Individual(child1, _coords));
+        new_population.push_back(Individual(child2, _coords));
     }
 
     _pop = new_population; // Replace the old population with the new one
 
+    SortByFitness(); // Instantly sort the new children!
+
+}
+
+void Population::SavePopulationLog(ofstream& out_file, int generation) const {
+    // _pop is already sorted from best (0) to worst (_pop_size - 1)
+    for (int i = 0; i < _pop_size; i++) {
+        // Write the metadata
+        out_file << generation << " "              
+                 << i << " "                       
+                 << _pop[i].get_fitness() << " ";  
+
+        // Write the tour
+        vector<int> tour = _pop[i].get_individual();
+        for (int city : tour) {
+            out_file << city << " ";
+        }
+        
+        out_file << endl;
+    }
 }
