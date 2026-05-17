@@ -15,8 +15,6 @@ void InitializeGenerator(Random &rnd){
     ifstream Primes("../utils/random/Primes");
     if (Primes.is_open()){
        Primes >> p1 >> p2 ;
-//       Primes >> p1 >> p2 ;
-//       Primes >> p1 >> p2 ;
     } else cerr << "PROBLEM: Unable to open Primes" << endl;
     Primes.close();
  
@@ -32,6 +30,38 @@ void InitializeGenerator(Random &rnd){
        }
        input.close();
     } else cerr << "PROBLEM: Unable to open seed.in" << endl;
+}
+
+// Random generator initializer for Parallel GA
+void InitializeMPI_Generator(Random& rnd, int rank) {
+    int p1, p2;
+    ifstream Primes("../utils/random/Primes");
+    if (Primes.is_open()) {
+        // ============ CHANGE FOR PARALLEL ===================================
+        // Read till rank-th line to get the correct primes for each process
+        for(int i = 0; i <= rank; i++) {
+            Primes >> p1 >> p2;
+        }
+
+    } else {
+        cerr << "PROBLEM: Unable to open Primes" << endl;
+        exit(1);
+    }
+    Primes.close();
+
+    ifstream Seed("../utils/random/seed.in");
+    string property;
+    int seed[4];
+    if (Seed.is_open()) {
+        while ( !Seed.eof() ) {
+            Seed >> property;
+            if( property == "RANDOMSEED" ){
+                Seed >> seed[0] >> seed[1] >> seed[2] >> seed[3];
+                rnd.SetRandom(seed,p1,p2);
+            }
+        }
+        Seed.close();
+    }
 }
 
 // This function opens an output file in the "outputs" directory, creating the directory if it does not exist

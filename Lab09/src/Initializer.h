@@ -74,19 +74,36 @@ inline mat SetupCoordinates(Config& config) {
         coord_mat = gen_coords.get_coords_matrix(); 
         
     } else {
-        cout << "Reading coordinates from data/cap_prov_ita.dat...\n";
-        
-        if (!coord_mat.load("data/cap_prov_ita.dat", arma::raw_ascii)) {
-            throw runtime_error("Coordinate Setup Error: Unable to load data/cap_prov_ita.dat");
+
+        if (config.COORDS_TYPE == "Square"){
+            cout << "Reading coordinates from input/Coords_square.dat...\n";
+
+            if (!coord_mat.load("input/Coords_square.dat", arma::raw_ascii)) {
+                throw runtime_error("Coordinate Setup Error: Unable to load input/Coords_square.dat");
+            }
+
+        } else if (config.COORDS_TYPE == "Circular") {
+            cout << "Reading coordinates from input/Coords_circumference.dat...\n";
+
+            if (!coord_mat.load("input/Coords_circumference.dat", arma::raw_ascii)) {
+                throw runtime_error("Coordinate Setup Error: Unable to load input/Coords_circumference.dat");
+            }
+
+        } else if (config.COORDS_TYPE == "Italy") {
+            cout << "Reading coordinates from input/cap_prov_ita.dat...\n";
+
+            if (!coord_mat.load("input/cap_prov_ita.dat", arma::raw_ascii)) {
+                throw runtime_error("Coordinate Setup Error: Unable to load input/cap_prov_ita.dat");
+            }
         }
-        
-        config.N_CITIES = coord_mat.n_rows; 
-        config.COORDS_TYPE = "Italy"; 
+
+        config.N_CITIES = coord_mat.n_rows;
+
     }
+    
 
     return coord_mat;
 }
-
 
 inline string SetupLoggers(ofstream& pop_log, ofstream& output_log, const Config& config) {
     

@@ -1,0 +1,15 @@
+N_CITIES            34
+POP_SIZE            500
+N_GENERATIONS       500
+GENERATE_COORDS     False
+COORDS_TYPE         Circular
+N_MIGR              10
+
+ENDINPUT
+
+Type of coordinates:
+- Circular: city coordinates uniformly distributed on a circumference
+- Square: city coordinates uniformly distributed inside a Square
+
+When GENERATE_COORDS is True, coordinates are generated according to a circumference or the inside of a square
+When GENERATE_COORDS is False, coordinates are read from a file chosen according to COORDS_TYPE. N_CITIES becomes irrelevant.

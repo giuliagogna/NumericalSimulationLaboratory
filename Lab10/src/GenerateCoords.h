@@ -70,8 +70,7 @@ public:
     void save_coords(){ // Method to save the coordinates of the cities to a file in the OUTPUT directory
         ofstream coutf;
         OpenOutputFile(coutf, string("/../input/Coords_") + _coord_type + ".dat");
-        
-        // No header because reading is hell
+
         for(int i=0; i<_n_cities; i++){
             // Let the city coordinates in the file go from 1 to _n_cities
             coutf << setw(12) << _coords(i, 0)
