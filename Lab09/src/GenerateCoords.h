@@ -69,7 +69,7 @@ public:
 
     void save_coords(){ // Method to save the coordinates of the cities to a file in the OUTPUT directory
         ofstream coutf;
-        OpenOutputFile(coutf, string("Coords_") + _coord_type + ".dat");
+        OpenOutputFile(coutf, string("/../input/Coords_") + _coord_type + ".dat");
 
         coutf << "# City_Index x_coordinate y_coordinate" << endl;
         for(int i=0; i<_n_cities; i++){

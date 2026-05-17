@@ -1,0 +1,13 @@
+N_CITIES            34
+POP_SIZE            700
+N_GENERATIONS       700
+GENERATE_COORDS     False
+COORDS_TYPE         Italy
+
+ENDINPUT
+
+Type of coordinates:
+- Circular: city coordinates uniformly distributed on a circumference
+- Square: city coordinates uniformly distributed inside a Square
+
+When GENERATE_COORDS is True, coordinates are generated, if it is false, coordinates are read from a file and the content of COORDS_TYPE and N_CITIES is irrelevant.

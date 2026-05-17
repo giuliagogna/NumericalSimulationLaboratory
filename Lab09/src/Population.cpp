@@ -10,6 +10,16 @@ using namespace std;
 
 Population::Population(int pop_size, int n_cities, Random& rnd, const mat& coords) 
     : _pop_size(pop_size), _n_cities(n_cities), _coords(coords), _rnd(rnd) {
+
+    if (_n_cities % 2 != 0) {
+        throw std::invalid_argument("Population Error: The number of cities (M) must be even for crossover.");
+    }
+    if (_pop_size % 2 != 0) {
+        throw std::invalid_argument("Population Error: The population size must be even.");
+    }
+    if (_coords.n_rows != static_cast<unsigned int>(_n_cities)) {
+         throw std::invalid_argument("Population Error: Mismatch between n_cities and coordinate matrix size.");
+    }
     
     for(int i = 0; i < _pop_size; i++) {
         vector<int> random_tour = GenerateRandomTour();

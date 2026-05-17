@@ -15,7 +15,7 @@ $(BUILD):
 $(BUILD)/exercise09.exe : $(BUILD)/exercise09.o $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/individual.o $(BUILD)/population.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/individual.o $(BUILD)/population.o $(BUILD)/exercise09.o -o $(BUILD)/exercise09.exe $(AFLAGS)
 
-$(BUILD)/exercise09.o : src/exercise09.cpp src/GenerateCoords.h
+$(BUILD)/exercise09.o : src/exercise09.cpp src/GenerateCoords.h src/Initializer.h
 	$(CC) -c src/exercise09.cpp -o $(BUILD)/exercise09.o $(CFLAGS)
 
 
