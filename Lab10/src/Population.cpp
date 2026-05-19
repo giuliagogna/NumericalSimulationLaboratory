@@ -213,9 +213,12 @@ void Population::EvolveOneGeneration(){
 
     vector<Individual> new_population;
 
+    // Always save the best element of the previous generation
+    new_population.push_back(_pop[0]);
+
     // Increment by two individual per cycle: crossover takes in two parents and produces two children, so at each iteration 
     // I make two processings. At the end of the cycle _pop_size processings have been done
-    for(int i = 0; i < _pop_size; i += 2){
+    for(int i = 1; i < _pop_size; i += 2){
         
         // Select two parents
         int p1_idx = Select();
@@ -228,7 +231,7 @@ void Population::EvolveOneGeneration(){
         vector<int> child1, child2;
         
         // Probability of crossover
-        double p_Crossover = 0.65; 
+        double p_Crossover = 0.7; 
 
         // Apply Crossover
         if(_rnd.Rannyu() < p_Crossover) {
@@ -240,7 +243,7 @@ void Population::EvolveOneGeneration(){
         }
 
         // Apply mutations independently for the two children
-        double p_Mutation = 0.07;
+        double p_Mutation = 0.1;
 
         if(_rnd.Rannyu() < p_Mutation) MutatePairPermutation(child1);
         if(_rnd.Rannyu() < p_Mutation) MutateShift(child1);

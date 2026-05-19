@@ -1,8 +1,8 @@
 N_CITIES            34
-POP_SIZE            500
-N_GENERATIONS       500
+POP_SIZE            1500
+N_GENERATIONS       1000
 GENERATE_COORDS     False
-COORDS_TYPE         Circular
+COORDS_TYPE         Italy
 N_MIGR              10
 
 ENDINPUT
