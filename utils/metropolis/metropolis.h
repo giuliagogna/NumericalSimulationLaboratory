@@ -8,11 +8,13 @@
 #include "../random/random.h"
 #include "../auxiliary_functions/functions.h"
 
+using namespace std;
+
 // Position in 3D space
 struct Position {
-    double x;
-    double y;
-    double z;
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
 };
 
 // ==============================================================
@@ -25,10 +27,10 @@ struct Position {
 struct Psi100{
     double a0 = 1.0; // Bohr radius in atomic units
     double operator()(Position p) const {
-        double r = std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
+        double r = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
 
         // Return |Psi|^2 proportional to exp(-2r/a0)
-        return std::exp(-2.0 * r / a0);
+        return exp(-2.0 * r / a0);
     }
 };
 
@@ -36,15 +38,32 @@ struct Psi100{
 struct Psi210{
     double a0 = 1.0; // Bohr radius in atomic units
     double operator()(Position p) const {
-        double r = std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
+        double r = sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
         double z = p.z;
 
         // |Psi|^2 is proportional to r^2 * exp(-r/a0) * cos^2(theta)
         // cos(theta) = z/r so r^2 simplifies:
-        return z * z * std::exp(-r / a0);
+        return z * z * exp(-r / a0);
     }   
 };
 
+
+// EXERCISE 8)
+// The probability density to sample is the squared modulus of the trial wavefunction
+// Ψ ∝ e^[-(x-μ)/2σ^2] + e^[-(x+μ)/2σ^2]
+// All normalization factors and constants drop since this function is used in the acceptance
+// rate
+
+struct Psi_T{
+    double mu = 0.0;
+    double sigma = 1.0;
+
+    double operator()(double x) const {
+        double arg1 = - (x * x) / (sigma*sigma); // argument of the exponentiaò
+        double arg2 = (x * mu) / (sigma*sigma); // argument of the cosh
+        return exp(arg1) * pow(cosh(arg2), 2);
+    }   
+};
 
 
 
@@ -57,27 +76,45 @@ struct Psi210{
 // ==============================================================
 
 // The Metropolis Algorithm Class
-template <typename Distribution>
+template <typename State, typename Distribution>
 class MetropolisAlgorithm {
 private:
     Distribution prob; // The distribution to sample from
     double _step = 0.5;
     string _tentative_distr = "uniform";
     int _accepted_moves = 0;
-    Position _initial_position;
+
+    // Using generical State allows to use a 3D or a 1D double: the type State is
+    // evaluated runtime thanks to constexpr
+    State _initial_position;
 
     // Tentative move function
-    Position tentative_move(Position p, Random& rnd) {
+    State tentative_move(State p, Random& rnd) {
+
         if (_tentative_distr == "uniform") {
-            p.x += _step * (rnd.Rannyu() - 0.5) * 2.0; 
-            p.y += _step * (rnd.Rannyu() - 0.5) * 2.0; 
-            p.z += _step * (rnd.Rannyu() - 0.5) * 2.0; 
+            // Compile-time check: is the State a Position? (3D Metropolis)
+            if constexpr (is_same_v<State, Position>){
+                p.x += _step * (rnd.Rannyu() - 0.5) * 2.0; 
+                p.y += _step * (rnd.Rannyu() - 0.5) * 2.0; 
+                p.z += _step * (rnd.Rannyu() - 0.5) * 2.0; 
+            }
+            // Compile-time check: is the State a 1D double? (1D Metropolis)
+            else if constexpr (std::is_same_v<State, double>) {
+                p += _step * (rnd.Rannyu() - 0.5) * 2.0;
+            }
+
         } else if (_tentative_distr == "gaussian") {
-            p.x = rnd.Gauss(p.x, _step); 
-            p.y = rnd.Gauss(p.y, _step); 
-            p.z = rnd.Gauss(p.z, _step); 
+            if constexpr (is_same_v<State, Position>){
+                p.x = rnd.Gauss(p.x, _step); 
+                p.y = rnd.Gauss(p.y, _step); 
+                p.z = rnd.Gauss(p.z, _step); 
+            }
+            else if constexpr(is_same_v<State, double>){
+                p = rnd.Gauss(p, _step);
+            }
+        
         } else {
-            std::cerr << "Error: Unknown distribution type. Returning old position." << std::endl;
+            cerr << "Error: Unknown distribution type. Returning old position." << endl;
             return p;
         }
         return p;
@@ -85,7 +122,7 @@ private:
 
 public:
     // Constructor initializes the probability distribution
-    MetropolisAlgorithm(Distribution p, Position initial_position, string tentative_distr_name = "uniform", double initial_step=0.5) : prob(p) {
+    MetropolisAlgorithm(Distribution p, State initial_position, string tentative_distr_name = "uniform", double initial_step=0.5) : prob(p) {
         _tentative_distr = tentative_distr_name;
         _step = initial_step;
         _accepted_moves = 0;
@@ -153,7 +190,7 @@ public:
         
         double current_acc = 0.0;
         
-        std::cout << "\nStarting calibration for distribution: " << _tentative_distr << "\n" << std::endl;
+        cout << "\nStarting calibration for distribution: " << _tentative_distr << "\n" << endl;
 
         while (true) {
 
@@ -166,15 +203,15 @@ public:
             
             current_acc = static_cast<double>(_accepted_moves) / n_steps_per_check;
             
-            std::cout << " =====   Tried step = " 
-                      << std::fixed << std::setprecision(4) << std::left << std::setw(8) << _step 
+            cout << " =====   Tried step = " 
+                      << fixed << setprecision(4) << left << setw(8) << _step 
                       << " ->   Acceptance = " 
-                      << std::right << std::setw(6) << std::setprecision(2) << (current_acc * 100.0) 
-                      << "%   ======" << std::endl;
+                      << right << setw(6) << setprecision(2) << (current_acc * 100.0) 
+                      << "%   ======" << endl;
 
             // If we are within the target acceptance window, we can stop tuning
-            if (std::abs(current_acc - target_acc) <= tolerance) {
-                std::cout << "\nCalibration completed! Step chosen = " << _step << "\n" << std::endl;
+            if (abs(current_acc - target_acc) <= tolerance) {
+                cout << "\nCalibration completed! Step chosen = " << _step << "\n" << endl;
                 break;
             } 
             // If accuracy is too high, make bigger steps
@@ -192,14 +229,14 @@ public:
     // Equilibration
 
     void equilibrate(Position& p, int& n_equilibration, Random& rnd){
-        std::cout << "Starting equilibration phase ..." << std::endl;
+        cout << "Starting equilibration phase ..." << endl;
 
         for(int i = 0; i < n_equilibration; i++) {
             perform_metropolis_move(p, rnd);
         }
 
         _accepted_moves = 0; // Reset accepted moves counter after equilibration
-        std::cout << "Equilibration phase completed!" << std::endl << std::endl;
+        cout << "Equilibration phase completed!" << endl << endl;
     }
 
 };

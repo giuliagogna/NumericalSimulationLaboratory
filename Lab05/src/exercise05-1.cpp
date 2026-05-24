@@ -86,8 +86,8 @@ int main() {
         Position pos1s = {1.0, 1.0, 1.0};
         Position pos2p = {1.0, 1.0, 1.0};
         
-        MetropolisAlgorithm<Psi100> metropolis100(psi_1s, pos1s, dist_type);
-        MetropolisAlgorithm<Psi210> metropolis210(psi_2p, pos2p, dist_type);
+        MetropolisAlgorithm<Position, Psi100> metropolis100(psi_1s, pos1s, dist_type);
+        MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p, dist_type);
 
         // TUNING
 
