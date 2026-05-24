@@ -55,8 +55,10 @@ struct Psi210{
 // rate
 
 struct Psi_T{
-    double mu = 0.0;
-    double sigma = 1.0;
+    double mu;
+    double sigma;
+
+    Psi_T(double mean=0.0, double std_dev=1.0): mu(mean), sigma(std_dev){}
 
     double operator()(double x) const {
         double arg1 = - (x * x) / (sigma*sigma); // argument of the exponentiaò
@@ -149,12 +151,12 @@ public:
         return _accepted_moves;
     }
 
-    void reset_position(Position& p) const {
+    void reset_position(State& p) const {
         p = _initial_position;
     }
 
     // Acceptance function
-    double acceptance(Position p_old, Position p_new) {
+    double acceptance(State p_old, State p_new) {
         double p_n = prob(p_new);
         double p_o = prob(p_old);
         
@@ -163,7 +165,7 @@ public:
     }
 
     // Assume the tentative disrtibution is symmetric, i.e. T(x|y) = T(y|x): either uniform or gaussian
-    void perform_metropolis_move(Position& current_p, Random& rnd) {
+    void perform_metropolis_move(State& current_p, Random& rnd) {
         
         // Propose a move according to the chosen distribution (now calling the private method)
         Position proposed_p = tentative_move(current_p, rnd);
@@ -181,7 +183,7 @@ public:
     }
 
     // Tuning step
-    void tune_step(Position& current_p, Random& rnd, double initial_step=0.5) {
+    void tune_step(State& current_p, Random& rnd, double initial_step=0.5) {
         
         _step = initial_step;
         double target_acc = 0.50;
@@ -228,7 +230,7 @@ public:
 
     // Equilibration
 
-    void equilibrate(Position& p, int& n_equilibration, Random& rnd){
+    void equilibrate(State& p, int& n_equilibration, Random& rnd){
         cout << "Starting equilibration phase ..." << endl;
 
         for(int i = 0; i < n_equilibration; i++) {
