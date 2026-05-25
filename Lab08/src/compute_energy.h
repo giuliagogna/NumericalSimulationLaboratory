@@ -36,9 +36,9 @@ pair<double, double> hamiltonian_expectation_value(
 
     // Metropolis: running with uniform proposal distribution as per exercise request
     MetropolisAlgorithm<double, Psi_T> metro(psi_T, x, "uniform");
-    metro.tune_step(x, rnd, 1.0);
+    metro.tune_step(x, rnd, 1.0, false);
     metro.reset_position(x);
-    metro.equilibrate(x, n_equilibration_steps, rnd);
+    metro.equilibrate(x, n_equilibration_steps, rnd, false);
 
     int n_mc_steps = n_blocks * block_length;
 
@@ -61,9 +61,9 @@ class SimulatedAnnealing{
     private:
 
     Random& _rnd;           // Random generator
-    double _temp;           // Temperature
     double _mu;             // Wavefunction parameter mu
     double _sigma;          // Wavefunction parameter sigma
+    double _temp;           // Temperature
     double _mu_step;        // SA step size for mu
     double _sigma_step;     // SA step size for sigma
     
@@ -76,14 +76,20 @@ class SimulatedAnnealing{
 
     public:
     // Constructor
-    SimulatedAnnealing(Random& rnd, double initial_mu, double initial_sigma, 
-        double temperature = 1.0, double mu_step = 0.1, double sigma_step = 0.1, 
-        int n_blocks = 20, int block_length = 1000) : 
+    SimulatedAnnealing(
+        Random& rnd, 
+        double initial_mu, 
+        double initial_sigma, 
+        double temperature = 1.0, 
+        double mu_step = 0.1, 
+        double sigma_step = 0.1, 
+        int n_blocks = 20, 
+        int block_length = 1000) : 
 
         _rnd(rnd),
-        _temp(temperature), 
         _mu(initial_mu),
         _sigma(initial_sigma),
+        _temp(temperature),
         _mu_step(mu_step),
         _sigma_step(sigma_step),
         _n_blocks(n_blocks),
@@ -135,7 +141,7 @@ class SimulatedAnnealing{
             _energy = new_energy;
             _energy_error = new_error;
         }
-        
+
     };
 
 };

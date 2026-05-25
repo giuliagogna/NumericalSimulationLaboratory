@@ -2,27 +2,25 @@ CC = g++
 CFLAGS = -Wall -O3 --std=c++17
 BUILD = .build
 
-CC = g++
-CFLAGS = -Wall -O3 --std=c++17
-BUILD = .build
+# Main target: compile both executables
+all: $(BUILD)/optimize.exe $(BUILD)/production.exe
 
-# Main target: compile all executables
-all: $(BUILD)/exercise08_2.exe
-
-# Create the hidden directory if it doesn't exist
 $(BUILD):
 	mkdir -p $(BUILD)
 
-# Exercise 08_1 is solved in a header file. For sake of clarity I will keep the second file named
-# exercise08_2 since it solves the second part of the exercise
+# Optimize Executable
+$(BUILD)/optimize.exe : $(BUILD)/optimize.o $(BUILD)/random.o $(BUILD)/functions.o
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/optimize.o -o $(BUILD)/optimize.exe
 
-# Exercise 2
-$(BUILD)/exercise08_2.exe : $(BUILD)/exercise08_2.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise08_2.o -o $(BUILD)/exercise08_2.exe
+$(BUILD)/optimize.o : src/optimize.cpp src/compute_energy.h | $(BUILD)
+	$(CC) -c src/optimize.cpp -o $(BUILD)/optimize.o $(CFLAGS)
 
-# Added the src/ path to the header and the order-only dependency | $(BUILD)
-$(BUILD)/exercise08_2.o : src/exercise08_2.cpp src/compute_energy.h | $(BUILD)
-	$(CC) -c src/exercise08_2.cpp -o $(BUILD)/exercise08_2.o $(CFLAGS)
+# Production Executable
+$(BUILD)/production.exe : $(BUILD)/production.o $(BUILD)/random.o $(BUILD)/functions.o
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/production.o -o $(BUILD)/production.exe
+
+$(BUILD)/production.o : src/production.cpp src/compute_energy.h | $(BUILD)
+	$(CC) -c src/production.cpp -o $(BUILD)/production.o $(CFLAGS)
 
 # Shared Libraries (Added | $(BUILD) here too)
 $(BUILD)/random.o : ../utils/random/random.cpp ../utils/random/random.h | $(BUILD)
@@ -31,10 +29,12 @@ $(BUILD)/random.o : ../utils/random/random.cpp ../utils/random/random.h | $(BUIL
 $(BUILD)/functions.o : ../utils/auxiliary_functions/functions.cpp ../utils/auxiliary_functions/functions.h ../utils/random/random.h | $(BUILD)
 	$(CC) -c ../utils/auxiliary_functions/functions.cpp -o $(BUILD)/functions.o $(CFLAGS)
 
-# Execution commands (Removed the duplicate run1 override)
-run: $(BUILD)/exercise08_2.exe
-	./$(BUILD)/exercise08_2.exe
+# Execution commands
+run_opt: $(BUILD)/optimize.exe
+	time ./$(BUILD)/optimize.exe
 
-# Clean up
-clean :
-	rm -rf $(BUILD) outputs/seed.out
+run_prod: $(BUILD)/production.exe
+	time ./$(BUILD)/production.exe
+
+# Master command to run the whole pipeline
+run_all: run_opt run_prod

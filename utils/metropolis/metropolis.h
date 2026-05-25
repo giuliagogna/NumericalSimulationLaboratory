@@ -168,7 +168,7 @@ public:
     void perform_metropolis_move(State& current_p, Random& rnd) {
         
         // Propose a move according to the chosen distribution (now calling the private method)
-        Position proposed_p = tentative_move(current_p, rnd);
+        State proposed_p = tentative_move(current_p, rnd);
         
         // Calculate acceptance probability
         double alpha = acceptance(current_p, proposed_p);
@@ -183,7 +183,7 @@ public:
     }
 
     // Tuning step
-    void tune_step(State& current_p, Random& rnd, double initial_step=0.5) {
+    void tune_step(State& current_p, Random& rnd, double initial_step=0.5, bool verbose = true) {
         
         _step = initial_step;
         double target_acc = 0.50;
@@ -192,7 +192,9 @@ public:
         
         double current_acc = 0.0;
         
-        cout << "\nStarting calibration for distribution: " << _tentative_distr << "\n" << endl;
+        if(verbose){
+            cout << "\nStarting calibration for distribution: " << _tentative_distr << "\n" << endl;
+        }
 
         while (true) {
 
@@ -205,15 +207,18 @@ public:
             
             current_acc = static_cast<double>(_accepted_moves) / n_steps_per_check;
             
-            cout << " =====   Tried step = " 
-                      << fixed << setprecision(4) << left << setw(8) << _step 
-                      << " ->   Acceptance = " 
-                      << right << setw(6) << setprecision(2) << (current_acc * 100.0) 
-                      << "%   ======" << endl;
-
+            if(verbose){
+                cout << " =====   Tried step = " 
+                          << fixed << setprecision(4) << left << setw(8) << _step 
+                          << " ->   Acceptance = " 
+                          << right << setw(6) << setprecision(2) << (current_acc * 100.0) 
+                          << "%   ======" << endl;
+            }
             // If we are within the target acceptance window, we can stop tuning
             if (abs(current_acc - target_acc) <= tolerance) {
-                cout << "\nCalibration completed! Step chosen = " << _step << "\n" << endl;
+                if(verbose){
+                    cout << "\nCalibration completed! Step chosen = " << _step << "\n" << endl;
+                }
                 break;
             } 
             // If accuracy is too high, make bigger steps
@@ -230,15 +235,19 @@ public:
 
     // Equilibration
 
-    void equilibrate(State& p, int& n_equilibration, Random& rnd){
-        cout << "Starting equilibration phase ..." << endl;
+    void equilibrate(State& p, int& n_equilibration, Random& rnd, bool verbose = true){
+        if(verbose){
+            cout << "Starting equilibration phase ..." << endl;
+        }
 
         for(int i = 0; i < n_equilibration; i++) {
             perform_metropolis_move(p, rnd);
         }
 
         _accepted_moves = 0; // Reset accepted moves counter after equilibration
-        cout << "Equilibration phase completed!" << endl << endl;
+        if(verbose){
+            cout << "Equilibration phase completed!" << endl << endl;
+        }
     }
 
 };
