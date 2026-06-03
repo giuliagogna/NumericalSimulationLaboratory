@@ -15,16 +15,18 @@ int main(){
     int M = 10000; // Total number of throws for each experiment
 
     // Open the output files for the three different distributions
+    // Uniform distribution
     ofstream output_uniform;
     OpenOutputFile(output_uniform, "01_2_random_uniform.dat");
     output_uniform << "# N=1 N=2 N=10 N=100" << endl;
 
-
+    // Exponential distribution
     double lambda = 1.0; // Parameter for the exponential distribution
     ofstream output_exponential;
     OpenOutputFile(output_exponential, "01_2_random_exponential.dat");
     output_exponential << "# N=1 N=2 N=10 N=100" << endl;
 
+    // Lorentzian distribution
     double mu = 0.0;    // Location parameter for the Lorentzian distribution
     double gamma = 1.0; // Scale parameter for the Lorentzian distribution
     ofstream output_Lorentzian;
@@ -64,10 +66,6 @@ int main(){
     output_Lorentzian.close();
 
     rnd.SaveSeed();
-
-
-
-
 
     return 0;
 }

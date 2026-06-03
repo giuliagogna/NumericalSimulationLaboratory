@@ -1,5 +1,6 @@
 #include "../../utils/random/random.h"
 #include "../../utils/auxiliary_functions/functions.h"
+#include "../../utils/data_blocking/data_blocking.h"
 #include <iostream>
 #include <cmath>
 #include <fstream>
@@ -13,17 +14,18 @@ int main(){
 
     // Setting the parameters for the Buffon experiment
 
-    double d = 10; // Distance between the lines
-    double L = 5; // Length of the needle
-    int M = 100; // Number of blocks
-    int N = 1000; // Number of throws in each block
+    double d = 10;   // Distance between the lines
+    double l = 5;    // Length of the needle
+    int N = 100;     // Number of blocks
+    int L = 10000;   // Number of throws for the calculation in each block
 
     ofstream pi_values;
     OpenOutputFile(pi_values, "01_3_pi_estimate.dat");
-    pi_values << "# throws pi_estimate error" << endl;
+    pi_values << "# Throws Blocks pi_estimate error" << endl;
 
-    double current_progressive_mean = 0.0;
-    double current_progressive_mean_squared = 0.0;
+    // The data blocker is initialized with block length of 1, since the values passed are already
+    // blocked estimates of pi, since it is not possible to estimate pi from a single throw
+    DataBlocker blocker(1);
 
     // Logic: 
     //      - for each throw I extract a random number between 0 and d/2 (distance of the centre of the needle from the closest line)
@@ -34,13 +36,13 @@ int main(){
     //         This samples the unit circle uniformlym and therefore the accepted points have an angle that is uniformly distributed
     //      - I calculate the norm of (dx, dy)
     //      - I compute the sine of the angle between the needle and the lines as dy/norm 
-    //      - If the distance of the centre of the needle from the closest line is smaller than L/2*sin(theta) then I count a crossing.
+    //      - If the distance of the centre of the needle from the closest line is smaller than l/2*sin(theta) then I count a crossing.
 
-    for(int i = 0; i < M; i++){
+    for(int i = 0; i < N; i++){ // Loop over the blocks
 
         int count_crossed = 0; // Counter for the number of times the needle crosses a line
 
-        for (int j = 0; j < N; j++){
+        for (int j = 0; j < L; j++){ // Loop over the throws
 
             double d_centre = rnd.Rannyu(0, d/2.0); // Distance of the centre of the needle from the closest line
 
@@ -56,30 +58,24 @@ int main(){
 
             double sin_theta = dy / norm; // Sine of the angle between the needle and the lines
 
-            if(d_centre <= (L/2)*sin_theta){
+            if(d_centre <= (l/2)*sin_theta){
                 count_crossed++;
             }
 
         }
 
         // Estimating pi in the current block
-        double pi_block = (2.0 * L * N) / (d * count_crossed);
-        double pi_block_squared = pi_block * pi_block;
+        double pi_block = (2.0 * l * L) / (d * count_crossed);
+        blocker.add_measurement(pi_block);
 
-        current_progressive_mean = (double(i) / double(i + 1)) * current_progressive_mean + pi_block / double(i + 1);
-        current_progressive_mean_squared = (double(i) / double(i + 1)) * current_progressive_mean_squared + pi_block_squared / double(i + 1);
-
-        // Number of current throws
-        int throws = current_throws(i, N);
-
-        pi_values << throws << " " 
-                  << current_progressive_mean << " " 
-                  << error(current_progressive_mean, current_progressive_mean_squared, i) 
+        // Since the internal block size is 1, a block is completed immediately
+        pi_values << (i + 1) * L << " "
+                  << blocker.get_completed_blocks() << " "
+                  << blocker.get_mean() << " " 
+                  << blocker.get_error()
                   << endl;
-
+        
     }
-
-
 
     pi_values.close();
 

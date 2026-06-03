@@ -5,6 +5,7 @@
 
 #include "../../utils/random/random.h"
 #include "../../utils/auxiliary_functions/functions.h"
+#include "../../utils/data_blocking/data_blocking.h"
 
 using namespace std;
 
@@ -20,6 +21,9 @@ int main(){
     int N = 100;         // Number of blocks
     int L = M/N;         // Number of throws in each block
 
+    // Setting up the DataBlocking
+    DataBlocker blocker_mean(L);
+    DataBlocker blocker_variance(L);
 
     // ==============================================================================================
     // 01.1.1 & 01.1.2 - Means, Variances and their uncertainties
@@ -28,53 +32,28 @@ int main(){
     // Opens the files to save the progressive means, variances and their respective uncertainties
     ofstream results_output;
     OpenOutputFile(results_output, "01_1_means_and_variances.dat");
-    results_output << "# Throws Mean Error_Mean Variance Error_Variance" << endl; // Header for the output file
+    results_output << "# Throws Block Mean Error_Mean Variance Error_Variance" << endl; // Header for the output file
 
-    double current_progressive_mean = 0.0;
-    double current_progressive_mean_squared = 0.0;
+    for(int i=0; i<M; i++){
 
-    double current_progressive_variance = 0.0;
-    double current_progressive_variance_squared = 0.0;
+        double r = rnd.Rannyu();
 
-    for(int i=0; i<N; i++){
-        
-        // Calculates the mean and the mean square, variance and variance squared in the current block
-        double sum_mean_block = 0.0;
-        double sum_var_block = 0.0;
-        
-        
-        for(int j=0; j<L; j++){
-            double r = rnd.Rannyu();
-            sum_mean_block += r;
-            sum_var_block += (r - 0.5) * (r - 0.5);
+        blocker_mean.add_measurement(r);
+        blocker_variance.add_measurement((r-0.5)*(r-0.5));
+
+        if((i+1)%L == 0 && i!=0){
+            // Save the current number of throws and the corresponding progressive mean and variances and their respective uncertainties to file
+            results_output << blocker_mean.get_current_throws() << " "
+                           << blocker_mean.get_completed_blocks() << " " 
+                           << blocker_mean.get_mean() << " " 
+                           << blocker_mean.get_error() << " "
+                           << blocker_variance.get_mean() << " " 
+                           << blocker_variance.get_error() 
+                           << endl;
+
         }
 
-
-        // Calculates the mean and the mean square in the current block
-        double current_mean = sum_mean_block / L;
-        double current_mean_squared = current_mean * current_mean;
-
-        // Stores the progressive mean and the progressive mean square up to the current block
-        current_progressive_mean = (double(i)/(i+1)) * current_progressive_mean + current_mean/(i+1);
-        current_progressive_mean_squared = (double(i)/(i+1)) * current_progressive_mean_squared + current_mean_squared/(i+1);  
-        
-        // Calculates the variance and the variance squared in the current block
-        double current_variance = sum_var_block / L;
-        double current_variance_squared = current_variance * current_variance;
-        
-        // Stores the progressive variance and the progressive variance square up to the current block
-        current_progressive_variance = (double(i)/(i+1)) * current_progressive_variance + current_variance/(i+1);
-        current_progressive_variance_squared = (double(i)/(i+1)) * current_progressive_variance_squared + current_variance_squared/(i+1);
-
-        // Save the current number of throws and the corresponding progressive mean and variances and their respective uncertainties to file
-        results_output << current_throws(i, L) << " " 
-                       << current_progressive_mean << " " 
-                       << error(current_progressive_mean, current_progressive_mean_squared, i) << " "
-                       << current_progressive_variance << " " 
-                       << error(current_progressive_variance, current_progressive_variance_squared, i) 
-                       << endl;
     }
-
 
     
     // ==============================================================================================
@@ -85,7 +64,7 @@ int main(){
     int n_throws = 10000;                        // Number of throws for each chi-squared test
     double p = double(n_throws)/double(n_bins);  // Expected number of throws in each bin
 
-    int n_chi_squared = 10000;                     // Number of chi-squared tests to perform
+    int n_chi_squared = 100000;                     // Number of chi-squared tests to perform
 
     ofstream chi_squared_output;
     OpenOutputFile(chi_squared_output, "01_1_chi_squared.dat");
@@ -111,8 +90,6 @@ int main(){
 
         chi_squared_output << chi_squared << endl;
     }
-
-
 
     rnd.SaveSeed();
 

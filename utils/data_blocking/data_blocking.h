@@ -35,15 +35,18 @@ public:
 
     // Closes the block and updates statistics
     void close_block() {
+
+        _completed_blocks++;
+
         double block_mean = _current_block_sum / _L;
-        double n = _completed_blocks + 1.0; 
+        double n = _completed_blocks; 
 
         _prog_mean = ((n - 1.0) / n) * _prog_mean + block_mean / n;
         _prog_mean_sq = ((n - 1.0) / n) * _prog_mean_sq + (block_mean * block_mean) / n;
 
-        _completed_blocks++;
         _current_step = 0;
         _current_block_sum = 0.0;
+
     }
 
     // Returns the current number of throws processed up to the current block

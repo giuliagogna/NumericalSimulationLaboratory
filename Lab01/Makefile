@@ -14,7 +14,7 @@ $(BUILD):
 $(BUILD)/exercise01-1.exe : $(BUILD)/exercise01-1.o $(BUILD)/random.o $(BUILD)/functions.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-1.o -o $(BUILD)/exercise01-1.exe
 
-$(BUILD)/exercise01-1.o : src/exercise01-1.cpp
+$(BUILD)/exercise01-1.o : src/exercise01-1.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise01-1.cpp -o $(BUILD)/exercise01-1.o $(CFLAGS)
 
 
@@ -30,7 +30,7 @@ $(BUILD)/exercise01-2.o : src/exercise01-2.cpp
 $(BUILD)/exercise01-3.exe : $(BUILD)/exercise01-3.o $(BUILD)/random.o $(BUILD)/functions.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-3.o -o $(BUILD)/exercise01-3.exe
 
-$(BUILD)/exercise01-3.o : src/exercise01-3.cpp
+$(BUILD)/exercise01-3.o : src/exercise01-3.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise01-3.cpp -o $(BUILD)/exercise01-3.o $(CFLAGS)
 
 
@@ -45,15 +45,15 @@ $(BUILD)/functions.o : ../utils/auxiliary_functions/functions.cpp ../utils/auxil
 # Execution commands
 # Executes firs exercise
 run1: $(BUILD)/exercise01-1.exe
-	./$(BUILD)/exercise01-1.exe
+	time ./$(BUILD)/exercise01-1.exe
 
 # Executes second exercise
 run2: $(BUILD)/exercise01-2.exe
-	./$(BUILD)/exercise01-2.exe
+	time ./$(BUILD)/exercise01-2.exe
 
 # Executes third exercise
 run3: $(BUILD)/exercise01-3.exe
-	./$(BUILD)/exercise01-3.exe
+	time ./$(BUILD)/exercise01-3.exe
 
 # Master command to execute all exercises
 run: run1 run2 run3
