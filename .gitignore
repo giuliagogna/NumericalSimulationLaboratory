@@ -4,7 +4,7 @@
 *.o
 
 # Exercise guidelines
-*/LSN_Exercises_*
+**/LSN_Exercises_*.ipynb
 
 # --- Outputs ---
 outputs/
