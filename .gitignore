@@ -3,6 +3,9 @@
 *.exe
 *.o
 
+# Exercise guidelines
+LSN_Exercises_*
+
 # --- Outputs ---
 outputs/
 
