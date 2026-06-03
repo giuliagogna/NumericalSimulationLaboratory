@@ -74,6 +74,8 @@ int main(){
     double best_mu = mu;
     double best_sigma = sigma;
 
+    double initial_temperature = annealer.get_temp();
+
     while (temp >= tmin) {
 
         // Save to file
@@ -82,6 +84,14 @@ int main(){
         trajectory << step << " " << annealer.get_temp()<< " " << annealer.get_mu() << " " << annealer.get_sigma() << endl;
 
         output << "Simulation step " << step << " completed." << endl;
+
+        // Progress that goes from 0 (start) to 1 (end)
+        double progress = (initial_temperature - temp) / (initial_temperature - tmin);
+
+        // Number of blocks goes from 5 at the highest temperature to 40 at the lowest
+        int dynamic_block_number = 5 + (int)(35 * progress);
+
+        annealer.set_n_blocks(dynamic_block_number);
 
         // Make the move and update temperature
         annealer.move();

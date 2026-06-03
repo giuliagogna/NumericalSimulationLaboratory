@@ -110,7 +110,10 @@ class SimulatedAnnealing{
     double get_energy_error() {return _energy_error;}
 
     // Setter needed by main to update temperature
-    void set_temp(double new_temp) { _temp = new_temp;}
+    void set_temp(double new_temp) {_temp = new_temp;}
+
+    // Setter needed to make the number of blocks in data blocking dynamic
+    void set_n_blocks(int n_blocks){_n_blocks = n_blocks;}
 
     // Method that performs a move at temperature _temp
     void move(){
@@ -118,7 +121,11 @@ class SimulatedAnnealing{
         // Propose new point in the parameter space
         double new_mu = _mu + (_rnd.Rannyu() - 0.5) * _mu_step;
         double new_sigma = _sigma + (_rnd.Rannyu() - 0.5) * _sigma_step;
-        new_sigma = abs(new_sigma); // Standard deviation needs to be positive
+        
+        // Reject the move if the values are negative: avoid degeneration
+        if (new_mu <= 0.0 || new_sigma <= 0.0) {
+            return; 
+        }
 
         // Evaluate energy in the new configuration
         pair<double, double> result = hamiltonian_expectation_value(new_mu, new_sigma, _rnd, _n_blocks, _block_length);
