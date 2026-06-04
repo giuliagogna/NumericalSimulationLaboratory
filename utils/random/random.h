@@ -44,7 +44,8 @@ public:
 
 
   // ===================== Method required for excercise 02.1 =====================
-  double distr_importance(double x);
+  double distr_importance();
+  double distr_sin();
   
 };
 

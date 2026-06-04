@@ -16,19 +16,17 @@ void step_lattice(Position& p, Random& rnd, double step_length) {
     else if (direction == 5) p.z -= step_length; 
 }
 
-void step_continuum(Position& p, Random& rnd, double step_length) {
-    double dx, dy, dz, norm;
+// This function uses the uniform sampling of the solid angle with the inverse transform method 
+void step_continuum(Position& p, Random& rnd, double step_length){
 
-    do {
-        dx = rnd.Rannyu() * 2.0 - 1.0;
-        dy = rnd.Rannyu() * 2.0 - 1.0;
-        dz = rnd.Rannyu() * 2.0 - 1.0;
-        
-        norm = sqrt(dx*dx + dy*dy + dz*dz);
-    } while (norm > 1.0); 
+    double phi = rnd.Rannyu(0, 2*M_PI);
+    double theta = rnd.distr_sin();
 
-    p.x += step_length * (dx / norm);
-    p.y += step_length * (dy / norm);
-    p.z += step_length * (dz / norm);
-    
+    double dx = step_length * sin(theta) * cos(phi);
+    double dy = step_length * sin(theta) * sin(phi);
+    double dz = step_length * cos(theta);
+
+    p.x += dx;
+    p.y += dy;
+    p.z += dz;
 }

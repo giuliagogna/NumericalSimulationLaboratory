@@ -20,7 +20,7 @@ int main(){
     int M = 100000;              // Total number of random walks
     int N = 100;                 // Number of blocks for averaging 
     int L = M / N;               // Number of random walks in each block
-    int n_steps = 100;           // Number of steps in each random walk 
+    int n_steps = 101;           // Number of steps in each random walk 
     float step_length = 1.0;     // Length of each step in the random walk
 
     // Vectors to store the progressive averages and their squares for error calculation

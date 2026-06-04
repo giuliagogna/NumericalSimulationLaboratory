@@ -84,12 +84,24 @@ double Random :: Lorentz(double mean, double gamma){
 
 // ===================== Method required for excercise 02.1 =====================
 
-double Random :: distr_importance(double x){
+double Random :: distr_importance(){
    // This function generates a random number from the distribution used for importance sampling in exercise 02.1
    // The distribution is d(x) = 2*(1-x) in the interval [0,1): with the inverse transform method, the random number can be generated as x = 1 - sqrt(1-r), where r is a random number uniformly distributed in the interval [0,1)
    
    double r=Rannyu();
    return 1 - sqrt(1-r);
+}
+
+// This method samples the angle theta in order to uniformly sample the solid angle:
+// In order for the solid angle to be sampled uniformly one should extract theta according to the distribution
+//                            p(theta) = 0.5sin(theta)
+// Using inverse transform
+double Random :: distr_sin(){
+
+   double r = Rannyu();
+   double theta = acos(1 - 2*r);
+
+   return theta;
 }
 
 

@@ -14,7 +14,7 @@ $(BUILD):
 $(BUILD)/exercise02-1.exe : $(BUILD)/exercise02-1.o $(BUILD)/random.o $(BUILD)/functions.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise02-1.o -o $(BUILD)/exercise02-1.exe
 
-$(BUILD)/exercise02-1.o : src/exercise02-1.cpp
+$(BUILD)/exercise02-1.o : src/exercise02-1.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise02-1.cpp -o $(BUILD)/exercise02-1.o $(CFLAGS)
 
 
@@ -41,11 +41,11 @@ $(BUILD)/RWlib.o : ../utils/RWlib/RWlib.cpp ../utils/RWlib/RWlib.h ../utils/rand
 # Execution commands
 # Executes firs exercise
 run1: $(BUILD)/exercise02-1.exe
-	./$(BUILD)/exercise02-1.exe
+	time ./$(BUILD)/exercise02-1.exe
 
 # Executes second exercise
 run2: $(BUILD)/exercise02-2.exe
-	./$(BUILD)/exercise02-2.exe
+	time ./$(BUILD)/exercise02-2.exe
 
 # Master command to execute all exercises
 run: run1 run2

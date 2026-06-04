@@ -9,7 +9,7 @@ struct Position {
     double z;
 };
 
-void step_lattice(Position& p, Random& rnd, double a);
-void step_continuum(Position& p, Random& rnd, double a);
+void step_lattice(Position& p, Random& rnd, double step_length);
+void step_continuum(Position& p, Random& rnd, double step_length);
 
 # endif // __RW__
