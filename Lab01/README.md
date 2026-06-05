@@ -40,6 +40,6 @@ make run
 ```
 
 ### Data Analysis
-The simulation results are processed in the analysis1.ipynb notebook.
+The simulation results are processed in the `analysis1.ipynb` notebook.
 
-Note: The raw data files (stored outputs/) are excluded from the repository to maintain a lightweight structure. The notebook contains the pre-rendered plots for immediate viewing on GitHub.
+Note: The raw data files (stored `outputs/`) are excluded from the repository to maintain a lightweight structure. The notebook contains the pre-rendered plots for immediate viewing on GitHub.
