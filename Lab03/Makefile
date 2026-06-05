@@ -14,7 +14,7 @@ $(BUILD):
 $(BUILD)/exercise03_1.exe : $(BUILD)/exercise03_1.o $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_1.o -o $(BUILD)/exercise03_1.exe
 
-$(BUILD)/exercise03_1.o : src/exercise03_1.cpp
+$(BUILD)/exercise03_1.o : src/exercise03_1.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise03_1.cpp -o $(BUILD)/exercise03_1.o $(CFLAGS)
 
 
@@ -22,7 +22,7 @@ $(BUILD)/exercise03_1.o : src/exercise03_1.cpp
 $(BUILD)/exercise03_2.exe : $(BUILD)/exercise03_2.o $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_2.o -o $(BUILD)/exercise03_2.exe
 
-$(BUILD)/exercise03_2.o : src/exercise03_2.cpp
+$(BUILD)/exercise03_2.o : src/exercise03_2.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise03_2.cpp -o $(BUILD)/exercise03_2.o $(CFLAGS)
 
 
