@@ -23,5 +23,6 @@ clean :
 	rm *.o simulator.exe
 
 remove:
-	rm ../OUTPUT/*.*
+	rm ../OUTPUT/*.dat
+	rm ../OUTPUT/*.out
 	rm ../OUTPUT/CONFIG/*.*

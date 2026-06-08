@@ -125,7 +125,6 @@ bool System :: metro(int i){ // Metropolis algorithm
 // =====================================================================
 // BOLTZMANN FUNCTION
 // Computes the potential energy of a single particle 'i' interacting with the rest of the system via the Lennard-Jones potential
-// Note on the name: it is called 'Boltzmann' because it is used by the Metropolis algorithm to calculate the energy difference (delta_E) required to evaluate the Boltzmann weight exp(-beta * delta_E).
 // =====================================================================
 double System :: Boltzmann(int i, bool xnew){
   double energy_i=0.0;
@@ -295,11 +294,19 @@ void System :: initialize_velocities(){
 
       // UNCOMMENT THE FOLLOWING LINES FOR EXERCISES 4.2 AND 4.3
       // Speeds are initialized with module v^*_{T^*} with non zero component only along x
-//      if (_rnd.Rannyu() > 0.5) vx(i) = 1.0;
-//      else vx(i) = -1.0;
-//      
-//      vy(i) = 0.0;
-//      vz(i) = 0.0; 
+
+      /* int choice = int(_rnd.Rannyu() * 6);
+
+      vx(i) = 0.0;
+      vy(i) = 0.0;
+      vz(i) = 0.0;
+      
+      if(choice == 0) vx(i) = 1.0;
+      else if (choice == 1) vx(i) = -1.0;
+      else if (choice == 2) vy(i) = 1.0;
+      else if (choice == 3) vy(i) = -1.0;
+      else if (choice == 4) vz(i) = 1.0;
+      else if (choice == 5) vz(i) = -1.0; */
 
       // Sum the speed components to calculate the center of mass velocity, which will be subtracted to all particles to set the total momentum of the system to zero
       sumv(0) += vx(i);
@@ -434,8 +441,8 @@ void System :: initialize_properties(){ // Initialize data members used for meas
         // ================================================================================================================
         _measure_pofv = true;
         _index_pofv = index_property;
-        index_property += _n_bins_v; // in the average vector, the measurement of the distribution take _n_bins_v indexes, not just
-                                     // one, like the other scalar properties
+        index_property += _n_bins_v; // in the average vector, the measurement of the distribution take _n_bins_v indexes, 
+                                     // not just one, like the other scalar properties
       } else if( property == "MAGNETIZATION" ){
         ofstream coutpr("../OUTPUT/magnetization.dat");
         coutpr << "#     BLOCK:   ACTUAL_M:     M_AVE:       ERROR:" << endl;
@@ -571,11 +578,11 @@ void System :: read_configuration(){
     for(int i=0; i<_npart; i++){
       cinf >> particle >> x >> y >> z; // units of coordinates in conf.xyz is _side
       // UNCOMMENT FOR EXERCISE 4.2 AND 4.3: half the coordinates to shrink the particles in 1/8 of the box 
-//      if (_restart == 0) { // only if it's the first time I run the simulation
-//        x = x/2.0;
-//        y = y/2.0;
-//        z = z/2.0;
-//      }
+      /* if (_restart == 0) { // only if it's the first time I run the simulation
+        x = x/2.0;
+        y = y/2.0;
+        z = z/2.0;
+      } */
       _particle(i).setposition(0, this->pbc(_side(0)*x, 0));
       _particle(i).setposition(1, this->pbc(_side(1)*y, 1));
       _particle(i).setposition(2, this->pbc(_side(2)*z, 2));
@@ -637,12 +644,12 @@ void System :: measure(){ // Measure properties
   // POFV CALCULATION (EXERCISE 4.1) ////////////////////////////////////////////
   if(_measure_pofv){
     double v_mod;
-    double norm = _npart * _bin_size_v;
+    double norm_inv = 1.0 / (_npart * _bin_size_v);
 
     for (int i=0; i<_npart; i++){
       v_mod = sqrt( dot(_particle(i).getvelocity(), _particle(i).getvelocity()) );
       bin = int(v_mod/_bin_size_v);
-      if (bin < _n_bins_v) _measurement(_index_pofv + bin) += 1.0 / norm;
+      if (bin < _n_bins_v) _measurement(_index_pofv + bin) += norm_inv;
     }
   }
   // POTENTIAL ENERGY //////////////////////////////////////////////////////////
@@ -788,27 +795,27 @@ void System :: averages(int blk){
   // EXERCISE 4.2: I do 1000 blocks of 50 steps each and plot 10 of these blocks
   // I plot the result of each block, not the progressive average, because the result in each block does not represent the same quantity (e.g MB distribution): I want to show that the distribution in each block converges to the MB
 
-//  if (_measure_pofv){
-//
-//    // Print block 1, 2, 3, 10, 20, 50, 100, 500, 1000
-//    if(blk == 1 || blk == 2 || blk == 3 || blk == 5 || blk == 10 || blk == 20 || blk == 50 || blk == 100 || blk == 500 || blk == _nblocks){
-//
-//      coutf.open("../OUTPUT/pofv_block" + to_string(blk) + ".dat",ios::app);
-//      coutf << "# VELOCITY:     ACTUAL_POFV:" << endl;
-//
-//      for(int i=0; i<_n_bins_v; i++){
-//        double velocity = (i + 0.5) * _bin_size_v; // get center of bin
-//
-//        double actual_prob = _average(_index_pofv + i);
-//
-//        coutf << setw(12) << velocity
-//              << setw(12) << actual_prob << endl;
-//      }
-//
-//      coutf.close();
-//
-//    }
-//  }
+  /* if (_measure_pofv){
+
+    // Print block 1, 2, 3, 10, 20, 50, 100, 500, 1000
+    if(blk == 1 || blk == 2 || blk == 3 || blk == 5 || blk == 10 || blk == 20 || blk == 50 || blk == 100 || blk == 500 || blk == _nblocks){
+
+      coutf.open("../OUTPUT/pofv_block" + to_string(blk) + ".dat",ios::app);
+      coutf << "# VELOCITY:     ACTUAL_POFV:" << endl;
+
+      for(int i=0; i<_n_bins_v; i++){
+        double velocity = (i + 0.5) * _bin_size_v; // get center of bin
+
+        double actual_prob = _average(_index_pofv + i);
+
+        coutf << setw(12) << velocity
+              << setw(12) << actual_prob << endl;
+      }
+
+      coutf.close();
+
+    }
+  } */
 
 
 
