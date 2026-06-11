@@ -6,9 +6,6 @@
 # Exercise guidelines
 **/LSN_Exercises_*.ipynb
 
-# --- Outputs ---
-outputs/
-
 # --- Python & Jupyter ---
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
