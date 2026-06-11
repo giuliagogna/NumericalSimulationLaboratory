@@ -16,3 +16,10 @@ __pycache__/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Outputs
+Lab08/outputs/
+Lab09/outputs/
+Lab10/outputs/
+Lab11/outputs/
+Lab12/outputs/
