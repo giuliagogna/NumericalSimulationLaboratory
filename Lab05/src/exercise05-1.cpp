@@ -12,9 +12,21 @@ using namespace std;
 
 int main() {
 
+    cout << "Starting main simulation" << endl;
+
     // INITIALIZING GENERATOR
     Random rnd;
     InitializeGenerator(rnd);
+
+    // OUTPUT LOG FILE
+    ofstream outlog;
+    OpenOutputFile(outlog, "outlog.dat");
+    outlog << "# Log file for main simulation" << endl << endl;
+
+    // Redirect the output to the outlog
+    streambuf* original_cout_buffer = cout.rdbuf();
+    cout.rdbuf(outlog.rdbuf());
+
 
     // DATA BLOCKING CONFIGURATION
 
@@ -38,12 +50,12 @@ int main() {
     config >> label >> n_blocks;
     config >> label >> N;
 
-    cout << "\n=== CONFIGURATION LOADED AUTOMATICALLY ===" << endl;
-    cout << " - Equilibration steps: " << n_equilibration_steps << endl;
-    cout << " - Block Length (L):    " << L << endl;
-    cout << " - Number of Blocks:    " << n_blocks << endl;
-    cout << " - Total Steps (N):     " << N << endl;
-    cout << "==========================================\n" << endl;
+    outlog << "\n=== CONFIGURATION LOADED AUTOMATICALLY ===" << endl;
+    outlog << " - Equilibration steps: " << n_equilibration_steps << endl;
+    outlog << " - Block Length (L):    " << L << endl;
+    outlog << " - Number of Blocks:    " << n_blocks << endl;
+    outlog << " - Total Steps (N):     " << N << endl;
+    outlog << "==========================================\n" << endl;
 
     // INITIALIZE WAVEFUNCTIONS
     Psi100 psi_1s;                      
@@ -57,9 +69,9 @@ int main() {
     // =========================================================================
     for (const string& dist_type : dist_types) {
         
-        cout << "\n============================================================" << endl;
-        cout << "  Starting simulation with " << dist_type << " distribution" << endl;
-        cout << "==============================================================\n" << endl;
+        outlog << "\n============================================================" << endl;
+        outlog << "  Starting simulation with " << dist_type << " distribution" << endl;
+        outlog << "==============================================================\n" << endl;
 
         string suffix = (dist_type == "uniform") ? "U" : "G";
 
@@ -67,13 +79,13 @@ int main() {
         ofstream output_1s_r, output_1s_pos, output_2p_r, output_2p_pos;
         
         OpenOutputFile(output_1s_r, "05_1_r100_" + suffix + ".dat");
-        output_1s_r << "# Block r100_Mean r100_Error" << endl;
+        output_1s_r << "# Throws Block r100_Mean r100_Error" << endl;
 
         OpenOutputFile(output_1s_pos, "05_1_pos100_" + suffix + ".dat");
         output_1s_pos << "# x y z" << endl;
 
         OpenOutputFile(output_2p_r, "05_1_r210_" + suffix + ".dat");
-        output_2p_r << "# Block r210_Mean r210_Error" << endl;
+        output_2p_r << "# Throws Block r210_Mean r210_Error" << endl;
 
         OpenOutputFile(output_2p_pos, "05_1_pos210_" + suffix + ".dat");
         output_2p_pos << "# x y z" << endl;
@@ -94,8 +106,8 @@ int main() {
         metropolis100.tune_step(pos1s, rnd, 1.0);
         metropolis210.tune_step(pos2p, rnd, 1.5);
 
-        cout << "Optimal step found for Psi100 (" << dist_type << "): " << metropolis100.get_step() << endl;
-        cout << "Optimal step found for Psi210 (" << dist_type << "): " << metropolis210.get_step() << endl;
+        outlog << "Optimal step found for Psi100 (" << dist_type << "): " << metropolis100.get_step() << endl;
+        outlog << "Optimal step found for Psi210 (" << dist_type << "): " << metropolis210.get_step() << endl << endl;
 
         // EQUILIBRATION
         metropolis100.reset_position(pos1s);
@@ -105,7 +117,7 @@ int main() {
         metropolis210.equilibrate(pos2p, n_equilibration_steps, rnd);
 
         // STARTING SIMULATION
-        cout << "Starting Metropolis..." << endl;
+        outlog << "Starting Metropolis..." << endl;
 
         int prev_completed_1s = 0;
         int prev_completed_2p = 0;
@@ -129,24 +141,31 @@ int main() {
 
             // Output blocking data if a new block is completed
             if(blocker1s.get_completed_blocks() > prev_completed_1s) {
-                output_1s_r << blocker1s.get_completed_blocks() << " " 
+                output_1s_r << blocker1s.get_current_throws() << " "
+                            << blocker1s.get_completed_blocks() << " " 
                             << blocker1s.get_mean() << " " 
                             << blocker1s.get_error() << endl;
                 prev_completed_1s = blocker1s.get_completed_blocks();
             }
 
             if(blocker2p.get_completed_blocks() > prev_completed_2p) {
-                output_2p_r << blocker2p.get_completed_blocks() << " "
+                output_2p_r << blocker2p.get_current_throws() << " "
+                            << blocker2p.get_completed_blocks() << " "
                             << blocker2p.get_mean() << " "
                             << blocker2p.get_error() << endl;
                 prev_completed_2p = blocker2p.get_completed_blocks();
             }
         }
 
-        cout << "Metropolis completed for " << dist_type << " distribution." << endl;
+        outlog << "Metropolis completed for " << dist_type << " distribution." << endl;
     } // End of distribution loop (files are auto-closed and objects destroyed here)
 
-    cout << "\nALL SIMULATIONS COMPLETED SUCCESSFULLY!" << endl;
+    outlog << "\nALL SIMULATIONS COMPLETED SUCCESSFULLY!" << endl;
+
+    // Return to standard output
+    cout.rdbuf(original_cout_buffer);
+
+    cout << "Simulation completed!" << endl;
 
     return 0;
 }

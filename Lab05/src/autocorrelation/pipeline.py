@@ -2,6 +2,11 @@ import numpy as np
 from scipy.optimize import curve_fit
 import subprocess
 from matplotlib import pyplot as plt
+import sys
+
+# =====================================================
+# UTILITIES
+# =====================================================
 
 # Compute autocorrelation function
 def compute_autocorrelation(x, max_lag):
@@ -64,152 +69,161 @@ def burn_in_calculation(r_array, expected_value, tolerance, window=50):
         return len(r_array)
 
 
-
-# ====================================================================
-# Raw data generation (autocorr_generator.cpp)
-# ====================================================================
-subprocess.run(["./.build/autocorr_generator.exe"], cwd="../../")
-print("Run completed!\n")
-
-# ====================================================================
-# Analysis for burnin and autocorrelation time
-# ====================================================================
-print("Analysis for burnin and autocorrelation time")
-
-# Data loading
-path = "../../outputs/"
-r_1s_U = np.loadtxt(path + "autocorr/autocorr_r100_U.dat")
-r_2p_U = np.loadtxt(path + "autocorr/autocorr_r210_U.dat")
-r_1s_G = np.loadtxt(path + "autocorr/autocorr_r100_G.dat")
-r_2p_G = np.loadtxt(path + "autocorr/autocorr_r210_G.dat")
-
-# A. Trovare il Burn-in automaticamente
-# Cerchiamo il primo indice in cui il raggio scende sotto il valore atteso + un piccolo margine
-# (es. r < 1.5 + 0.1). L'argwhere restituisce tutti gli indici, noi prendiamo il primissimo [0][0]
-expected_r_1s = 1.5
-expected_r_2p = 5.0
-tolerance = 0.1
-
-burn_in_idx_1s_U = burn_in_calculation(r_1s_U, expected_r_1s, tolerance)
-burn_in_idx_2p_U = burn_in_calculation(r_2p_U, expected_r_2p, tolerance)
-burn_in_idx_1s_G = burn_in_calculation(r_1s_G, expected_r_1s, tolerance)
-burn_in_idx_2p_G = burn_in_calculation(r_2p_G, expected_r_2p, tolerance)
-
-print(f" -> Thermalization found ad index:")
-print(f"        - 1s U: {burn_in_idx_1s_U} steps")
-print(f"        - 2p U: {burn_in_idx_2p_U} steps")
-print(f"        - 1s G: {burn_in_idx_1s_G} steps")
-print(f"        - 2p G: {burn_in_idx_2p_G} steps\n")
-
-# Find worst case scenario for burn-in (the one that takes more steps to thermalize)
-burn_in_idx = max(burn_in_idx_1s_U, burn_in_idx_2p_U, burn_in_idx_1s_G, burn_in_idx_2p_G)
-print(f" -> Worst case burn-in: {burn_in_idx} steps\n")
-
-
-# ====================================================================
-# Plot Equilibration Phase (Burn-in)
-# ====================================================================
-print("Generating equilibration plots...")
-
-# Definiamo le etichette qui in alto così le usiamo in entrambi i grafici
-labels = ["1s state (Uniform)", "2p state (Uniform)", "1s state (Gaussian)", "2p state (Gaussian)"]
-
-# Calculate how many steps to plot: at least 1000 steps, or 4 times the burn-in phase (to show clearly the thermalization process)
-steps_to_plot = max(1000, int(burn_in_idx * 4))
-steps_arr = np.arange(steps_to_plot)
-
-fig_eq, axes_eq = plt.subplots(2, 2, figsize=(15, 10))
-axes_eq = axes_eq.flatten()
-
-raw_data_list = [r_1s_U, r_2p_U, r_1s_G, r_2p_G]
-expected_vals = [expected_r_1s, expected_r_2p, expected_r_1s, expected_r_2p]
-burn_in_vals = [burn_in_idx_1s_U, burn_in_idx_2p_U, burn_in_idx_1s_G, burn_in_idx_2p_G]
-
-for ax, data, label, exp_val, bi_val in zip(axes_eq, raw_data_list, labels, expected_vals, burn_in_vals):
+print("Starting pipeline for generation and analysis of burn-in and autocorrelation function")
+# Redirect the output to file
+with open('../../outputs/autocorr/out.txt', 'w') as f:
     
-    ax.plot(steps_arr, data[:steps_to_plot], marker='.', linestyle='-', color='blue', alpha=0.4, markersize=3, label='r trace')
-    ax.axhline(exp_val, color='red', linestyle='--', linewidth=2, label=f"Expected $\\langle r \\rangle$ = {exp_val}")
-    ax.axvline(bi_val, color='green', linestyle='-', linewidth=2, label=f"Detected Burn-in ({bi_val})")
-    
-    ax.set_title(f"Equilibration Phase: {label}", fontsize=13)
-    ax.set_xlabel("Monte Carlo Step")
-    ax.set_ylabel("Instantaneous radius $r$ ($a_0$)")
-    ax.legend(loc="upper right")
-    ax.grid(True, alpha=0.3)
+    orig_stdout = sys.stdout
+    sys.stdout = f
 
-plt.tight_layout()
-plt.savefig(path + "autocorr/equilibration_analysis.png", dpi=300)
-print("Equilibration plots saved!\n")
+    print("\n\n====================================================")
+    print(" AUTOMATIC PIPELINE: AUTOCORRELATION AND BURN-IN")
+    print("====================================================\n")
 
-
-
-#===================================================================
-# Autocorrelation Analysis
-#===================================================================
-
-# Cut the data to keep only the equilibrated part
-r_1s_U_equil = r_1s_U[burn_in_idx:]
-r_2p_U_equil = r_2p_U[burn_in_idx:]
-r_1s_G_equil = r_1s_G[burn_in_idx:]
-r_2p_G_equil = r_2p_G[burn_in_idx:]
+    # ====================================================================
+    # Raw data generation (autocorr_generator.cpp)
+    # ====================================================================
+    print("Running 'autocorr_generator.cpp'...")
+    subprocess.run(["./.build/autocorr_generator.exe"], cwd="../../", stdout=f, text=True)
+    print("...Autocorrelation data generation completed!\n")
 
 
+    # ====================================================================
+    # Analysis for burnin and autocorrelation time
+    # ====================================================================
+    print("Analysis for burnin and autocorrelation time")
 
-# Calculate autocorrelation on equilibrated data
-max_tau = 300
-lags = np.arange(max_tau)
+    # Data loading
+    path = "../../outputs/"
+    r_1s_U = np.loadtxt(path + "autocorr/autocorr_r100_U.dat")
+    r_2p_U = np.loadtxt(path + "autocorr/autocorr_r210_U.dat")
+    r_1s_G = np.loadtxt(path + "autocorr/autocorr_r100_G.dat")
+    r_2p_G = np.loadtxt(path + "autocorr/autocorr_r210_G.dat")
 
-acf1s_U = compute_autocorrelation(r_1s_U_equil, max_tau)
-acf2p_U = compute_autocorrelation(r_2p_U_equil, max_tau)
-acf1s_G = compute_autocorrelation(r_1s_G_equil, max_tau)
-acf2p_G = compute_autocorrelation(r_2p_G_equil, max_tau)
+    # Burn-in
+    expected_r_1s = 1.5
+    expected_r_2p = 5.0
+    tolerance = 0.1
 
-acfs = [acf1s_U, acf2p_U, acf1s_G, acf2p_G]
-labels = ["1s state (Uniform)", "2p state (Uniform)", "1s state (Gaussian)", "2p state (Gaussian)"]
+    burn_in_idx_1s_U = burn_in_calculation(r_1s_U, expected_r_1s, tolerance)
+    burn_in_idx_2p_U = burn_in_calculation(r_2p_U, expected_r_2p, tolerance)
+    burn_in_idx_1s_G = burn_in_calculation(r_1s_G, expected_r_1s, tolerance)
+    burn_in_idx_2p_G = burn_in_calculation(r_2p_G, expected_r_2p, tolerance)
 
-# Fit the data to the exponential curve and plot results
+    print(f" -> Thermalization found at index:")
+    print(f"        - 1s U: {burn_in_idx_1s_U} steps")
+    print(f"        - 2p U: {burn_in_idx_2p_U} steps")
+    print(f"        - 1s G: {burn_in_idx_1s_G} steps")
+    print(f"        - 2p G: {burn_in_idx_2p_G} steps\n")
 
-fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-axes = axes.flatten() # Flatten the 2D array of axes into a 1D array for easy iteration
-
-print("\nExponential Fit Results for Correlation Times:")
-print("=" * 60)
-
-# Loop simultaneously through the ACFs, their labels, and their designated subplot axis (ax)
-
-worst_tau_c = 0.0
-
-for acf, label, ax in zip(acfs, labels, axes):
-
-    # Perform the exponential fit (starting from index 1 to avoid tau=0 where Ac=1 perfectly)
-    popt, pcov = curve_fit(exponential_decay, lags[1:], acf[1:])
-    tau_c = popt[0]
-    
-    if tau_c > worst_tau_c:
-        worst_tau_c = tau_c
-
-    # Print result to console
-    print(f"[{label}] -> Estimated tau_c: {tau_c:.1f} steps")
-
-    # Plot the data and the fit
-    ax.plot(lags, acf, label="Measured Data", marker='.', linestyle='none', markersize=4, color='blue')
-    ax.plot(lags, exponential_decay(lags, tau_c), label=f"Exp. Fit: $\\tau_c$ = {tau_c:.1f}", color='red', linewidth=2)
-    ax.axhline(0, color='black', linestyle='--', alpha=0.5)
-    ax.axvline(tau_c, color='coral', linestyle='--', alpha=0.5, label=f"$\\tau_c$ = {tau_c:.1f} steps")
-
-    # 3. Format the subplot
-    ax.set_title(f"Autocorrelation: {label}", fontsize=13)
-    ax.set_xlabel("Time Lag ($\\tau$)")
-    ax.set_ylabel("Autocorrelation $Ac(\\tau)$")
-    ax.legend(loc="upper right")
-    ax.grid(True, alpha=0.3)
-
-print("=" * 60, "\n")
-
-plt.tight_layout()
-plt.savefig(path + "/autocorr/autocorrelation_analysis.png", dpi=300)
+    # Find worst case scenario for burn-in (the one that takes more steps to thermalize)
+    burn_in_idx = max(burn_in_idx_1s_U, burn_in_idx_2p_U, burn_in_idx_1s_G, burn_in_idx_2p_G)
+    print(f" -> Worst case burn-in: {burn_in_idx} steps\n")
 
 
+    # ====================================================================
+    # Plot Equilibration Phase (Burn-in)
+    # ====================================================================
+    print("Generating equilibration plots...")
+
+    labels = ["1s state (Uniform)", "2p state (Uniform)", "1s state (Gaussian)", "2p state (Gaussian)"]
+
+    # Calculate how many steps to plot: at least 1000 steps, or 4 times the burn-in phase (to show clearly the thermalization process)
+    steps_to_plot = max(1000, int(burn_in_idx * 4))
+    steps_arr = np.arange(steps_to_plot)
+
+    fig_eq, axes_eq = plt.subplots(2, 2, figsize=(15, 10))
+    axes_eq = axes_eq.flatten()
+
+    raw_data_list = [r_1s_U, r_2p_U, r_1s_G, r_2p_G]
+    expected_vals = [expected_r_1s, expected_r_2p, expected_r_1s, expected_r_2p]
+    burn_in_vals = [burn_in_idx_1s_U, burn_in_idx_2p_U, burn_in_idx_1s_G, burn_in_idx_2p_G]
+
+    for ax, data, label, exp_val, bi_val in zip(axes_eq, raw_data_list, labels, expected_vals, burn_in_vals):
+
+        ax.plot(steps_arr, data[:steps_to_plot], marker='.', linestyle='-', color='blue', alpha=0.4, markersize=3, label='r trace')
+        ax.axhline(exp_val, color='red', linestyle='--', linewidth=2, label=f"Expected $\\langle r \\rangle$ = {exp_val}")
+        ax.axvline(bi_val, color='green', linestyle='-', linewidth=2, label=f"Detected Burn-in ({bi_val})")
+
+        ax.set_title(f"Equilibration Phase: {label}", fontsize=13)
+        ax.set_xlabel("Monte Carlo Step")
+        ax.set_ylabel("Instantaneous radius $r$ ($a_0$)")
+        ax.legend(loc="upper right")
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(path + "autocorr/equilibration_analysis.png", dpi=300)
+    print("Equilibration plots saved!\n")
+
+
+
+    #===================================================================
+    # Autocorrelation Analysis
+    #===================================================================
+
+    # Cut the data to keep only the equilibrated part
+    r_1s_U_equil = r_1s_U[burn_in_idx:]
+    r_2p_U_equil = r_2p_U[burn_in_idx:]
+    r_1s_G_equil = r_1s_G[burn_in_idx:]
+    r_2p_G_equil = r_2p_G[burn_in_idx:]
+
+    # Calculate autocorrelation on equilibrated data
+    max_tau = 300
+    lags = np.arange(max_tau)
+
+    acf1s_U = compute_autocorrelation(r_1s_U_equil, max_tau)
+    acf2p_U = compute_autocorrelation(r_2p_U_equil, max_tau)
+    acf1s_G = compute_autocorrelation(r_1s_G_equil, max_tau)
+    acf2p_G = compute_autocorrelation(r_2p_G_equil, max_tau)
+
+    acfs = [acf1s_U, acf2p_U, acf1s_G, acf2p_G]
+
+    # ====================================================================
+    # Calculate Autocorrelation and Plot
+    # ====================================================================
+
+    labels = ["1s state (Uniform)", "2p state (Uniform)", "1s state (Gaussian)", "2p state (Gaussian)"]
+
+    # Fit the data to the exponential curve and plot results
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    axes = axes.flatten()
+
+    print("\nExponential Fit Results for Correlation Times:")
+    print("=" * 60)
+
+    worst_tau_c = 0.0
+
+    for acf, label, ax in zip(acfs, labels, axes):
+
+        # Perform the exponential fit (starting from index 1 to avoid tau=0 where Ac=1 perfectly)
+        popt, pcov = curve_fit(exponential_decay, lags[1:], acf[1:])
+        tau_c = popt[0]
+
+        if tau_c > worst_tau_c:
+            worst_tau_c = tau_c
+
+
+        print(f"[{label}] -> Estimated tau_c: {tau_c:.1f} steps")
+
+        # Plot the data and the fit
+        ax.plot(lags, acf, label="Measured Data", marker='.', linestyle='none', markersize=4, color='blue')
+        ax.plot(lags, exponential_decay(lags, tau_c), label=f"Exp. Fit: $\\tau_c$ = {tau_c:.1f}", color='red', linewidth=2)
+        ax.axhline(0, color='black', linestyle='--', alpha=0.5)
+        ax.axvline(tau_c, color='coral', linestyle='--', alpha=0.5, label=f"$\\tau_c$ = {tau_c:.1f} steps")
+
+        ax.set_title(f"Autocorrelation: {label}", fontsize=13)
+        ax.set_xlabel("Time Lag ($\\tau$)")
+        ax.set_ylabel("Autocorrelation $Ac(\\tau)$")
+        ax.legend(loc="upper right")
+        ax.grid(True, alpha=0.3)
+
+    print("=" * 60, "\n")
+
+    plt.tight_layout()
+    plt.savefig(path + "/autocorr/autocorrelation_analysis.png", dpi=300)
+
+# Reset normal output
+sys.stdout = orig_stdout
 
 # ====================================================================
 # PARAMETERS SELECTION AND EXPORT
@@ -220,7 +234,7 @@ equilibration_steps = int(burn_in_idx * 10)
 
 # Correlation time (block length): 100 times the worst tau_c found among the 4 cases
 M = 100                       # Number of blocks
-L = int(worst_tau_c * 100)    # Block length (100 times the worst tau_c)
+L = int(worst_tau_c * 1000)    # Block length (100 times the worst tau_c)
 N = L * M                     # Total number of steps (100 blocks)
 
 print("Saving congiguration in 'config.txt'...")
@@ -231,3 +245,5 @@ with open("config.txt", "w") as f:
     f.write(f"TOTAL_STEPS {N}\n")
 
 print("Configuration saved correctly!\n")
+
+print("Pipeline terminated. Outputs in outputs/autocorr/out.txt.")

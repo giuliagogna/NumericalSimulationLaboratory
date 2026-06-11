@@ -23,6 +23,7 @@ struct Position {
 
 // Note: avoid all normalization constants, since they cancel in the acceptance ratio
 
+// EXERCISE 5)
 // Hydrogen ground state wavefunction (1s orbital) (squared module)
 struct Psi100{
     double a0 = 1.0; // Bohr radius in atomic units
@@ -34,6 +35,7 @@ struct Psi100{
     }
 };
 
+// EXERCISE 5)
 // Hydrogen 2p orbital wavefunction (n=2, l=1, m=0) (squared module)
 struct Psi210{
     double a0 = 1.0; // Bohr radius in atomic units
@@ -156,6 +158,7 @@ public:
     }
 
     // Acceptance function
+    // Assume the tentative disrtibution is symmetric, i.e. T(x|y) = T(y|x): either uniform or gaussian
     double acceptance(State p_old, State p_new) {
         double p_n = prob(p_new);
         double p_o = prob(p_old);
@@ -179,7 +182,7 @@ public:
             _accepted_moves++;       // Increment accepted moves counter
         }
 
-        // If the move is rejected, current_p remains unchanged
+        // If the move is rejected, current_p and _accepted_moves remain unchanged
     }
 
     // Tuning step

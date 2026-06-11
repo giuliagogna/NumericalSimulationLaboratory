@@ -37,16 +37,26 @@ int main() {
         OpenOutputFile(output_2p_r, filename2p);
         output_2p_r << "# r" << endl;
 
-        Position pos1s = {1.0, 1.0, 1.0};
-        Position pos2p = {1.0, 1.0, 1.0};
+        Position pos1s = {50.0, 50.0, 50.0};
+        Position pos2p = {50.0, 50.0, 50.0};
+
+        cout << "================================================================" << endl;
+        cout << "GENERATION OF AUTOCORRELATION DATA" << endl;
+        cout << "================================================================" << endl << endl;
+
+        cout << "Initial position Psi100: { " << pos1s.x << ", " << pos1s.y << ", " << pos1s.z << " }" << endl;
+        cout << "Initial position Psi210: { " << pos1s.x << ", " << pos1s.y << ", " << pos1s.z << " }" << endl << endl;
         
+        cout << "================================================================" << endl << endl;
+
+        cout << "Using Psi100" << endl;
         MetropolisAlgorithm<Position, Psi100> metropolis100(psi_1s, pos1s, dist_type);
-        MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p, dist_type);
-
         metropolis100.tune_step(pos1s, rnd, 1.0);
-        metropolis210.tune_step(pos2p, rnd, 1.0);
-
         metropolis100.reset_position(pos1s); 
+
+        cout << "Using Psi210" << endl;
+        MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p, dist_type);        
+        metropolis210.tune_step(pos2p, rnd, 1.0);
         metropolis210.reset_position(pos2p);
 
         cout << "Generating raw data..." << endl;
@@ -61,6 +71,8 @@ int main() {
         }
 
         cout << "Data saved in " << filename1s << ", " << filename2p << endl;
+
+        cout << "================================================================" << endl;
 
     }
 
