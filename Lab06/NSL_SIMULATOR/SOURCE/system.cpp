@@ -9,7 +9,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************/
 
 #include <cmath>
-#include <cstdlib>
+#include <cstdlib> 
 #include <string>
 #include "system.h"
 
@@ -84,7 +84,8 @@ double System :: Force(int i, int dim){ // Calculates the force acting on partic
 // ====================================================
 
 void System :: move(int i){ // Propose a MC move for particle i
-  if(_sim_type == 3){ //Gibbs sampler for Ising
+
+  if(_sim_type == 3){ // Gibbs sampler for Ising
 
     // ===================================
     // EX 6) GIBBS SAMPLER FOR ISING 1D
@@ -93,7 +94,7 @@ void System :: move(int i){ // Propose a MC move for particle i
     int left_spin = _particle(this->pbc(i-1)).getspin();
     int right_spin = _particle(this->pbc(i+1)).getspin();
 
-    // Calculate the energy difference between the state with spin i +1 and the state with spin i -1
+    // Calculate the energy difference between the state with spin si=-1 and the state with spin si=+1
     double delta_E_minus_to_plus = 2.0 * (_J * (left_spin + right_spin) + _H);
 
     // Conditional probability of spin i being +1 given the states of its neighbors
@@ -101,17 +102,20 @@ void System :: move(int i){ // Propose a MC move for particle i
 
     double r = _rnd.Rannyu();
 
+    // Assign the spin to the i-th particle based on the conditional probability distribution
+    // for that spin
     if(r < p_plus){
       _particle(i).setspin(+1);
     } else {
       _particle(i).setspin(-1);
     }
 
-    // Increment accepted moves every time, because Gibbs ALWAYS accepts the proposed state
+    // Increment accepted moves every time, because Gibbs always accepts the proposed state
     _naccepted++;
 
 
   } else {                    // M(RT)^2
+
     if(_sim_type == 1){       // LJ system
       vec shift(_ndim);       // Will store the proposed translation
       for(int j=0; j<_ndim; j++){
@@ -887,8 +891,8 @@ void System :: averages(int blk){
           << setw(12) << this->error(sum_average, sum_ave2, blk) << endl;
     coutf.close();
   }
-  // SPECIFIC HEAT /////////////////////////////////////////////////////////////
 
+  // SPECIFIC HEAT /////////////////////////////////////////////////////////////
   if (_measure_cv) {
     coutf.open("../OUTPUT/specific_heat.dat",ios::app);
     average = _average(_index_cv); // now contains the specific heat: can operate directly on this
