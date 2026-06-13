@@ -80,6 +80,20 @@ def copy_config():
         print(f"Error: Source file {src} not found. Cannot continue.")
         sys.exit(1)
 
+def reset_config():
+    """Copies config.ising to config.spin to ensure a completely random starting configuration."""
+    src = os.path.join(SIMULATOR_DIR, 'INPUT', 'CONFIG', 'config.ising')
+    dst = os.path.join(SIMULATOR_DIR, 'INPUT', 'CONFIG', 'config.spin')
+
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+
+    try:
+        shutil.copy(src, dst)
+        print("  -> Reset input configuration to config.ising")
+    except FileNotFoundError:
+        print(f"Error: Source file {src} not found. Cannot continue.")
+        sys.exit(1)
+
 def rename_output_files(temp_val, mode="whole"):
     """Renames output files based on mode, shrinks data, and drops unnecessary logs."""
     output_dir = os.path.join(SIMULATOR_DIR, 'OUTPUT')
@@ -150,6 +164,9 @@ def main():
 
         temp_start = 2.0
         print(f"\n=== Processing T = {temp_start} ===")
+
+        # Resets configuration to totally random when performing the simulation from the top
+        reset_config()
         
         # --- EQUILIBRATION ---
         print("  -> Equilibration phase ...")
