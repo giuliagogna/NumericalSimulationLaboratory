@@ -6,18 +6,18 @@ This directory contains the C++ implementation and data analysis for the fourth 
 - `SOURCE/system.cpp` & `SOURCE/system.h`: Core C++ implementation of the simulation engine. It includes the Verlet integration scheme, force calculations with Periodic Boundary Conditions (PBC), and data blocking measurements.
 - `SOURCE/main.cpp`: Main execution file that initializes the system, runs the blocks/steps loop, and finalizes the simulation.
 - `INPUT/`: Directory containing the simulation settings:
-  - `input.dat`: Main parameters (temperature, density, cut-off radius, blocks, steps, restart flag).
+  - `input.dat`: Main parameters (simulation type flag, restart flag, temperature, numbr of particles, density, cut-off radius, algorithm step, number of blocks, number of steps, restart flag).
   - `properties.dat`: Flags to enable/disable specific property measurements (e.g., potential energy, temperature, POFV).
   - `CONFIG/`: Contains the starting spatial configurations (e.g., the ideal `config.fcc` lattice).
 - `OUTPUT/`: Target directory for the simulation results (e.g., `temperature.dat`, `pofv.dat`) and the updated phase-space configurations.
-- `analysis4.ipynb` & `analysis4_2.ipynb`: Jupyter Notebooks containing the data analysis, $\chi^2$ statistical testing, theoretical comparisons, and visualization of the thermalization and reversibility experiments.
-- `Makefile`: Automated build system for compilation and execution.
+- `analysis4.ipynb`: Jupyter Notebooks containing the data analysis, $\chi^2$ statistical testing, theoretical comparisons, and visualization of the thermalization and reversibility experiments.
+- `SOURCE/Makefile`: Automated build system for compilation and execution.
 
 ## Compilation and Usage
 The project uses a hidden `.build/` directory to store object files and executables, keeping the root directory clean.
 
 ### Build
-To compile the simulator:
+To compile the simulator navigate to the directory `SOURCE/` and execute:
 
 ```bash
 make
@@ -25,7 +25,7 @@ make
 
 ### Execution
 
-The simulation is driven by the configuration files in the `INPUT/` directory. To run the different parts of the exercise, you must edit `INPUT/input.dat` and `INPUT/properties.dat` accordingly, then execute the simulator:
+The simulation is driven by the configuration files in the `INPUT/` directory. To run the different parts of the exercise, you must edit `INPUT/input.dat` and `INPUT/properties.dat` accordingly, then execute the simulator in `SOURCE/` with:
 
 ```bash
 time ./simulator.exe
