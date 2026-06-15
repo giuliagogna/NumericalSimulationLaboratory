@@ -587,7 +587,7 @@ void System :: write_XYZ(int nconf){
 }
 
 // ============================================================================
-// Read configuration from a .xyz file in directory ../OUTPUT/CONFIG/
+// Read configuration from a .xyz file in directory ../INPUT/CONFIG/
 // ============================================================================
 void System :: read_configuration(){
   ifstream cinf;
@@ -653,7 +653,7 @@ void System :: measure(){ // Measure properties
   double magnetization=0.0;
   double virial=0.0;
   if (_measure_penergy or _measure_pressure or _measure_gofr) {
-    for (int i=0; i<_npart-1; i++){ // Doppio ciclo per considerare tutte le coppie di particelle una sola volta
+    for (int i=0; i<_npart-1; i++){ // Double loop consider each pair of particle only once
       for (int j=i+1; j<_npart; j++){
         distance(0) = this->pbc( _particle(i).getposition(0,true) - _particle(j).getposition(0,true), 0);
         distance(1) = this->pbc( _particle(i).getposition(1,true) - _particle(j).getposition(1,true), 1);
@@ -664,7 +664,9 @@ void System :: measure(){ // Measure properties
         // EX 7) CALCULATION OF DISTRIBUTION FUNCTION GOFR FOR LENNARD-JONES FLUID
         // ========================================================================================
         if(_measure_gofr){
-          if(dr < _halfside.min()){ // We consider only distances smaller than half the box side, because of periodic boundary conditions
+          if(dr < _halfside.min()){ // We consider only distances smaller than half the box side, because of periodic boundary conditions, minimum image convention and the spherical symmetry of the potential
+          // If we considered distances larger than halfside we would not respect minimum image convention (there would be a closer image in another cell), and the spherical shell would be larger than the cubical cell
+
             bin = int(dr/_bin_size);
             if (bin < _n_bins) _measurement(_index_gofr + bin) += 2.0; // here I store the row countings
           }
