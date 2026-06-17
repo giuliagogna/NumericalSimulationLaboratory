@@ -12,14 +12,14 @@ $(BUILD):
 $(BUILD)/optimize.exe : $(BUILD)/optimize.o $(BUILD)/random.o $(BUILD)/functions.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/optimize.o -o $(BUILD)/optimize.exe
 
-$(BUILD)/optimize.o : src/optimize.cpp src/compute_energy.h | $(BUILD)
+$(BUILD)/optimize.o : src/optimize.cpp src/simulated_annealing.h | $(BUILD)
 	$(CC) -c src/optimize.cpp -o $(BUILD)/optimize.o $(CFLAGS)
 
 # Production Executable
 $(BUILD)/production.exe : $(BUILD)/production.o $(BUILD)/random.o $(BUILD)/functions.o
 	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/production.o -o $(BUILD)/production.exe
 
-$(BUILD)/production.o : src/production.cpp src/compute_energy.h | $(BUILD)
+$(BUILD)/production.o : src/production.cpp src/simulated_annealing.h | $(BUILD)
 	$(CC) -c src/production.cpp -o $(BUILD)/production.o $(CFLAGS)
 
 # Shared Libraries (Added | $(BUILD) here too)
@@ -38,3 +38,7 @@ run_prod: $(BUILD)/production.exe
 
 # Master command to run the whole pipeline
 run_all: run_opt run_prod
+
+# Cleanup
+clean:
+	rm -rf $(BUILD) outputs/seed.out

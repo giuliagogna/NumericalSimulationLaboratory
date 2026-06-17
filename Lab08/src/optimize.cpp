@@ -1,6 +1,6 @@
 #include <cmath>
 #include <iostream>
-#include "compute_energy.h"
+#include "simulated_annealing.h"
 
 using namespace std;
 

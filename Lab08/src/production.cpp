@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "compute_energy.h"
+#include "simulated_annealing.h"
 
 using namespace std;
 
