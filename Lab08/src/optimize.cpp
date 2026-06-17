@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include "compute_energy.h"
 
@@ -17,16 +18,17 @@ int main(){
     }
 
     string label;
-    int n_blocks, block_length, n_eq_steps, prod_blocks, prod_block_length;
-    double mu_step, sigma_step, temp, temp_step, tmin, mu, sigma;
+    int high_blocks, low_blocks, block_length, n_eq_steps, prod_blocks, prod_block_length;
+    double mu_step, sigma_step, temp, temp_reduction_factor, tmin, mu, sigma;
 
-    config >> label >> n_blocks;
+    config >> label >> high_blocks;
+    config >> label >> low_blocks;
     config >> label >> block_length;
     config >> label >> n_eq_steps;
     config >> label >> mu_step;
     config >> label >> sigma_step;
     config >> label >> temp;
-    config >> label >> temp_step;
+    config >> label >> temp_reduction_factor;
     config >> label >> tmin;
     config >> label >> mu;
     config >> label >> sigma;
@@ -49,11 +51,12 @@ int main(){
     OpenOutputFile(output, "output.dat");
     // Write configuration log
     output << "=== SIMULATED ANNEALING CONFIGURATION ===" << endl;
-    output << "VMC Blocks: " << n_blocks << " | Block Length: " << block_length << endl;
+    output << "VMC Blocks at high temp: " << high_blocks << " | Block Length: " << block_length << endl;
+    output << "VMC Blocks at low temp: " << low_blocks << " | Block Length: " << block_length << endl;
     output << "Equilibration Steps: " << n_eq_steps << endl;
     output << "Initial Mu: " << mu << " | Mu Step Size: " << mu_step << endl;
     output << "Initial Sigma: " << sigma << " | Sigma Step Size: " << sigma_step << endl;
-    output << "Initial Temp: " << temp << " | Temp Step: " << temp_step << endl;
+    output << "Initial Temp: " << temp << " | Temp Step: " << temp_reduction_factor << endl;
     output << "=========================================\n" << endl;
 
     SimulatedAnnealing annealer(
@@ -63,14 +66,14 @@ int main(){
         temp,
         mu_step,
         sigma_step,
-        n_blocks,
+        high_blocks,
         block_length
     );
 
     int step = 0;
 
     // Variables to track the absolute minimum found during the search
-    double best_energy = 1000.0;
+    double best_energy = INFINITY;
     double best_mu = mu;
     double best_sigma = sigma;
 
@@ -88,8 +91,8 @@ int main(){
         // Progress that goes from 0 (start) to 1 (end)
         double progress = (initial_temperature - temp) / (initial_temperature - tmin);
 
-        // Number of blocks goes from 5 at the highest temperature to 40 at the lowest
-        int dynamic_block_number = 5 + (int)(35 * progress);
+        // Dynamic number of blocks
+        int dynamic_block_number = high_blocks + (int)((low_blocks - high_blocks) * progress);
 
         annealer.set_n_blocks(dynamic_block_number);
 
@@ -103,7 +106,7 @@ int main(){
             best_sigma = annealer.get_sigma();
         }
 
-        temp -= temp_step;
+        temp *= temp_reduction_factor;
         annealer.set_temp(temp);
 
         // Increment step

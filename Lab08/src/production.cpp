@@ -26,7 +26,7 @@ int main(){
     int n_eq_steps, prod_blocks, prod_block_length;
 
     // skip the lines until we reach the ones we need
-    for(int i=0; i<2; i++) config >> label >> label; 
+    for(int i=0; i<3; i++) config >> label >> label; 
     config >> label >> n_eq_steps;
     for(int i=0; i<7; i++) config >> label >> label; 
     config >> label >> prod_blocks;
@@ -53,7 +53,6 @@ int main(){
     prod_metro.tune_step(x, rnd, 1.0, true); 
     prod_metro.equilibrate(x, n_eq_steps, rnd, true);
 
-    int prev_completed = 0;
     int total_steps = prod_blocks * prod_block_length;
 
     for (int i = 0; i < total_steps; i++) {
@@ -65,11 +64,10 @@ int main(){
         prod_blocker.add_measurement(e_loc);
 
         // Print on file only when a block has finished
-        if (prod_blocker.get_completed_blocks() > prev_completed) {
+        if ((i+1)%prod_block_length==0 && i !=0) {
             best_energy_file << prod_blocker.get_completed_blocks() << " " 
                              << prod_blocker.get_mean() << " " 
                              << prod_blocker.get_error() << "\n";
-            prev_completed = prod_blocker.get_completed_blocks();
         }
     }
 
