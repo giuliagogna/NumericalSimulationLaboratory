@@ -34,8 +34,7 @@ bool Individual::_is_valid() {
             return false;
         }
         if (visited[_idxs[i] - 1]) {
-            // If the visited vector at position idx-1 is already true, it means tath said index is already passed into the for
-            // loop, therefore the city is visited more than once
+            // If the visited vector at position idx-1 is already true, it means tath said index has already passed into the for loop, therefore the city is visited more than once
             cerr << "Error: City index " << _idxs[i] << " is visited more than once." << endl;
             return false;
         }
@@ -46,7 +45,7 @@ bool Individual::_is_valid() {
 }
 
 
-void Individual::_compute_fitness(const mat& coords) {
+double Individual::_compute_fitness(const mat& coords) {
     double tour_length = 0.0;
 
     for(int i=0; i < _n_cities; i++){
@@ -61,7 +60,7 @@ void Individual::_compute_fitness(const mat& coords) {
         // Last iteration of this loop closes the circle: city_idx_1 is the second-to-last city which is the last city before coming back to 1, city_idx_2 is the last city which is city 1
     }
 
-    _fitness = tour_length;
+    return tour_length;
 }
 
 
@@ -70,7 +69,7 @@ Individual::Individual(const vector<int>& idxs, const mat& coords) {
     _n_cities = idxs.size() - 1; // The number of cities is the size of the tour minus one (since the tour starts and ends at city 1)
     _fitness = 0.0; 
 
-    // Automatically validate the city sequence provided by the Population
+    // Automatically validate the city sequence
     if(!_is_valid()){
         cerr << "Error: Invalid tour sequence provided to Individual constructor." << endl;
         cerr << "Generated sequence: ";
@@ -78,11 +77,11 @@ Individual::Individual(const vector<int>& idxs, const mat& coords) {
             cerr << idx << " ";
         }        
         cerr << endl;
-        exit(EXIT_FAILURE);
+        exit(1);
     }
 
     // Calculate the fitness using the provided coordinates
-    _compute_fitness(coords);
+    _fitness = _compute_fitness(coords);
 }
 
 double Individual::get_fitness() const { 

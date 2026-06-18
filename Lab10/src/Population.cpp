@@ -218,7 +218,8 @@ void Population::EvolveOneGeneration(){
 
     // Increment by two individual per cycle: crossover takes in two parents and produces two children, so at each iteration 
     // I make two processings. At the end of the cycle _pop_size processings have been done
-    for(int i = 1; i < _pop_size; i += 2){
+    // Loop until the new population is completely full
+    while (new_population.size() < _pop_size) {
         
         // Select two parents
         int p1_idx = Select();
@@ -227,24 +228,19 @@ void Population::EvolveOneGeneration(){
         vector<int> parent1 = _pop[p1_idx].get_individual();
         vector<int> parent2 = _pop[p2_idx].get_individual();
 
-        // Vectors that will host the children: they will be filled by the crossover function, but they need to be defined here to be passed as arguments
         vector<int> child1, child2;
         
-        // Probability of crossover
-        double p_Crossover = 0.7; 
-
         // Apply Crossover
+        double p_Crossover = 0.7; 
         if(_rnd.Rannyu() < p_Crossover) {
             Crossover(parent1, parent2, child1, child2);
         } else {
-            // If crossover does not trigger, the children are exact clones of the parents
             child1 = parent1;
             child2 = parent2;
         }
 
-        // Apply mutations independently for the two children
+        // Apply Mutations
         double p_Mutation = 0.1;
-
         if(_rnd.Rannyu() < p_Mutation) MutatePairPermutation(child1);
         if(_rnd.Rannyu() < p_Mutation) MutateShift(child1);
         if(_rnd.Rannyu() < p_Mutation) MutateInversion(child1);
@@ -255,16 +251,20 @@ void Population::EvolveOneGeneration(){
         if(_rnd.Rannyu() < p_Mutation) MutateInversion(child2);
         if(_rnd.Rannyu() < p_Mutation) MutateBlockSwap(child2);
 
-        // The children get added to the new population: add both
-        // I added a safety check in the main: if the population size provided is odd, the program gives error
+        // Add the first child
         new_population.push_back(Individual(child1, _coords));
-        new_population.push_back(Individual(child2, _coords));
+
+        // Only add the second child if we haven't reached the limit yet
+        if (new_population.size() < _pop_size) {
+            new_population.push_back(Individual(child2, _coords));
+        }
     }
 
-    _pop = new_population; // Replace the old population with the new one
+    // Replace the old population with the new one
+    _pop = new_population; 
 
-    SortByFitness(); // Instantly sort the new children!
-
+    // Sort the new children
+    SortByFitness(); 
 }
 
 void Population::SavePopulationLog(ofstream& out_file, int generation) const {
