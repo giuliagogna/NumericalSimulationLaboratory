@@ -17,6 +17,7 @@ struct Config {
     int N_GENERATIONS = 0;
     string GENERATE_COORDS = "False";
     string COORDS_TYPE = "";
+    bool USE_SYNTHETIC_LOG;
 };
 
 inline Config ReadInput(const string& filename) {
@@ -41,6 +42,8 @@ inline Config ReadInput(const string& filename) {
             in_file >> config.GENERATE_COORDS;
         } else if (key == "COORDS_TYPE") {
             in_file >> config.COORDS_TYPE;
+        } else if (key == "USE_SYNTHETIC_LOG") {
+            in_file >> config.USE_SYNTHETIC_LOG;
         }
         else {
             // If the key isn't any of the above, immediately crash and warn the user!
@@ -110,11 +113,18 @@ inline string SetupLoggers(ofstream& pop_log, ofstream& output_log, const Config
     // =========================================================
     // SETUP THE MASTER DATA LOG (poplog_...)
     // =========================================================
-    string filename = "poplog_N" + to_string(config.N_CITIES) + 
+    string base_name = "poplog_N" + to_string(config.N_CITIES) + 
                       "_Pop" + to_string(config.POP_SIZE) + 
                       "_Gen" + to_string(config.N_GENERATIONS) + 
-                      "_" + config.COORDS_TYPE + ".dat";
-                      
+                      "_" + config.COORDS_TYPE;
+                 
+    string filename;
+    if (config.USE_SYNTHETIC_LOG) {
+        filename = base_name + "_synth.dat";
+    } else {
+        filename = base_name + ".dat";
+    }
+
     OpenOutputFile(pop_log, filename);
 
     pop_log << "# --- TSP Genetic Algorithm Run ---\n"

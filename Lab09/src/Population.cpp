@@ -291,3 +291,24 @@ void Population::SavePopulationLog(ofstream& out_file, int generation) const {
         out_file << endl;
     }
 }
+
+void Population::SavePopulationLogSynth(ofstream& out_file, int generation) const {
+    // _pop is already sorted from best (0) to worst (_pop_size - 1)
+    for (int i = 0; i < _pop_size; i++) {
+        // Write the metadata for all individuals
+        out_file << generation << " "              
+                 << i << " "                       
+                 << _pop[i].get_fitness();
+
+        // Write the full tour only for the absolute best individual (Rank 0)
+        if (i == 0) {
+            out_file << " ";
+            vector<int> tour = _pop[i].get_individual();
+            for (int city : tour) {
+                out_file << city << " ";
+            }
+        }
+        
+        out_file << endl;
+    }
+}

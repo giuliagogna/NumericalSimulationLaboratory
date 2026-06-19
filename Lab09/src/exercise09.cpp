@@ -29,13 +29,23 @@ int main() {
     string filename = SetupLoggers(pop_log, output_log, config); 
 
     // Save Generation 0
-    population.SavePopulationLog(pop_log, 0);
+    if (config.USE_SYNTHETIC_LOG) {
+        population.SavePopulationLogSynth(pop_log, 0);
+    } else {
+        population.SavePopulationLog(pop_log, 0);
+    }
     output_log << "Generation 0 | Best Fitness: " << population.GetBestFitness() << endl;
 
     // EVOLUTIONARY ENGINE
     for(int i = 1; i <= config.N_GENERATIONS; i++){
         population.EvolveOneGeneration(); 
-        population.SavePopulationLog(pop_log, i);
+        
+        // Dynamically choose the logger based on the input.dat flag
+        if (config.USE_SYNTHETIC_LOG) {
+            population.SavePopulationLogSynth(pop_log, i); 
+        } else {
+            population.SavePopulationLog(pop_log, i);
+        }
             
         if (i % 10 == 0 || i == config.N_GENERATIONS) {
             output_log << "Generation " << i << " | Best Fitness: " << population.GetBestFitness() << endl;
