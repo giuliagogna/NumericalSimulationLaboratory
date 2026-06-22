@@ -11,14 +11,13 @@ using namespace std;
 Population::Population(int pop_size, int n_cities, Random& rnd, const mat& coords) 
     : _pop_size(pop_size), _n_cities(n_cities), _coords(coords), _rnd(rnd) {
 
-    if (_n_cities % 2 != 0) {
-        throw std::invalid_argument("Population Error: The number of cities (M) must be even for crossover.");
-    }
     if (_pop_size % 2 != 0) {
-        throw std::invalid_argument("Population Error: The population size must be even.");
+        cerr << "\nWARNING [Population]: The population size (" << _pop_size 
+        << ") is odd. Crossover efficiency is slightly reduced because one child will be discarded per generation.\n" << endl;
     }
     if (_coords.n_rows != static_cast<unsigned int>(_n_cities)) {
-         throw std::invalid_argument("Population Error: Mismatch between n_cities and coordinate matrix size.");
+        cerr << "Population Error: Mismatch between n_cities and coordinate matrix size." << endl;
+        exit(1);
     }
     
     for(int i = 0; i < _pop_size; i++) {
@@ -46,8 +45,8 @@ vector<int> Population::GenerateRandomTour() {
     return idxs;
 }
 
+// Helper function to pass to sort algorithm
 bool CompareFitness(const Individual& a, const Individual& b) {
-    // Helper function to pass to sort algorithm
     return a.get_fitness() < b.get_fitness();
 }
 
@@ -60,13 +59,14 @@ void Population::SortByFitness() {
 // Select an Individual from the Population
 int Population::Select() {
     double r = _rnd.Rannyu();
-    double p = 2.0; // The exponent. p > 1 privileges lower indices (better fitness)
+    double p = 3.0; // The exponent. p > 1 privileges lower indices (better fitness)
 
     // Relying on the fact that the generator never generates exactly 1 (otherwise quite a bit of a problem)
-    int j = static_cast<int>(_pop_size * pow(r, p)) + 1;
+    int j = static_cast<int>(_pop_size * pow(r, p));
 
     // To ensure the index is never out of bouds
     if(j >= _pop_size) { 
+        cout << "In Select(): j out of bounds. j = " << j << endl;
         j = _pop_size - 1; 
     }
     
@@ -76,6 +76,8 @@ int Population::Select() {
 // --- GENETIC OPERATORS ---
 
 //  MUTATIONS
+
+// Swaps the position of two cities in the tour
 void Population::MutatePairPermutation(vector<int>& child_idxs) {
     // Pick two random positions, strictly greater than 0 (never move city 1)
     // Relying on the fact that generator never extract exactly 1 and so the maximum integer part that can result
@@ -91,8 +93,9 @@ void Population::MutatePairPermutation(vector<int>& child_idxs) {
     swap(child_idxs[idx1], child_idxs[idx2]);
 }
 
+// Shift of +n positions for m contiguous cities (except for the first city and m < N-1)
 void Population::MutateShift(vector<int>& child_idxs) {
-    // Shifts cities from index start_index to start_index + n_to_shift - 1 by shift_amount positions to the right (circularly)
+    // Shifts cities from index start_index to start_index + n_to_shift - 1 by amount_to_shift positions to the right (circularly)
     int start_index = static_cast<int>(_rnd.Rannyu(1, _n_cities - 1));           // Starting index of the block to shift
     int n_to_shift = static_cast<int>(_rnd.Rannyu(1, _n_cities - start_index));   // Number of cities to shift
 
@@ -107,12 +110,13 @@ void Population::MutateShift(vector<int>& child_idxs) {
         child_idxs[i + amount_to_shift] = child_copy[i];
     }
 
-    for(int i = start_index + n_to_shift; i < start_index + n_to_shift + amount_to_shift; i++){
-        child_idxs[i - n_to_shift] = child_copy[i];
+    for(int i = start_index; i < start_index + amount_to_shift; i++){
+        child_idxs[i] = child_copy[i + n_to_shift];
     }
 
 }
 
+// Reverse the order of m contiguous cities
 void Population::MutateInversion(vector<int>& child_idxs) {
     // Pick a starting point > 0
     int start_index = static_cast<int>(_rnd.Rannyu(1, _n_cities - 1));
@@ -123,6 +127,7 @@ void Population::MutateInversion(vector<int>& child_idxs) {
     reverse(child_idxs.begin() + start_index, child_idxs.begin() + end_index + 1);
 }
 
+// Swaps two blocks of m < N_pop/2 contiguous cities
 void Population::MutateBlockSwap(vector<int>& child_idxs) {
 
     int movable_cities = _n_cities - 1;
@@ -130,14 +135,16 @@ void Population::MutateBlockSwap(vector<int>& child_idxs) {
     int block_size = static_cast<int>(_rnd.Rannyu(1, max_block_size + 1));
 
     // start_block_1 is the left block
-    // it must leave at least `block_size` spaces to its right for block 2
+    // it must leave at least `block_size` spaces to its right for block 2 (so there has to be space for 2 blocks)
     int max_start_1 = movable_cities - (2 * block_size) + 1;
     int start_block_1 = static_cast<int>(_rnd.Rannyu(1, max_start_1 + 1));
 
     // start_block_2 is always on the right of block 1
-    // it must start strictly after block 1 ends, and have room to finish
+    // it must start strictly after block 1 ends
     int min_start_2 = start_block_1 + block_size;
+    // It must have renough room to finish
     int max_start_2 = movable_cities - block_size + 1;
+
     int start_block_2 = static_cast<int>(_rnd.Rannyu(min_start_2, max_start_2 + 1));
 
     for(int i = 0; i < block_size; i++) {
@@ -149,7 +156,8 @@ void Population::MutateBlockSwap(vector<int>& child_idxs) {
 
 //  CROSSOVER
 
-void Population::Crossover(const vector<int>& parent1, const vector<int>& parent2, vector<int>& child1, vector<int>& child2) {
+void Population::Crossover(const vector<int>& parent1, const vector<int>& parent2, vector<int>& child1, vector<int>& child2) { // Pass child 1 and 2 as arguments: they will be hollow vectors that get filled with
+    // the indexes. This allows returning two vecs
     int size = parent1.size();
 
     // random cut position: avoid index 0 (city 1) and the last index (also city 1)
@@ -216,8 +224,6 @@ void Population::EvolveOneGeneration(){
     // Always save the best element of the previous generation
     new_population.push_back(_pop[0]);
 
-    // Increment by two individual per cycle: crossover takes in two parents and produces two children, so at each iteration 
-    // I make two processings. At the end of the cycle _pop_size processings have been done
     // Loop until the new population is completely full
     while (new_population.size() < _pop_size) {
         
@@ -279,6 +285,27 @@ void Population::SavePopulationLog(ofstream& out_file, int generation) const {
         vector<int> tour = _pop[i].get_individual();
         for (int city : tour) {
             out_file << city << " ";
+        }
+        
+        out_file << endl;
+    }
+}
+
+void Population::SavePopulationLogSynth(ofstream& out_file, int generation) const {
+    // _pop is already sorted from best (0) to worst (_pop_size - 1)
+    for (int i = 0; i < _pop_size; i++) {
+        // Write the metadata for all individuals
+        out_file << generation << " "              
+                 << i << " "                       
+                 << _pop[i].get_fitness();
+
+        // Write the full tour only for the absolute best individual (Rank 0)
+        if (i == 0) {
+            out_file << " ";
+            vector<int> tour = _pop[i].get_individual();
+            for (int city : tour) {
+                out_file << city << " ";
+            }
         }
         
         out_file << endl;

@@ -46,7 +46,7 @@ bool Individual::_is_valid() {
 }
 
 
-void Individual::_compute_fitness(const mat& coords) {
+double Individual::_compute_fitness(const mat& coords) {
     double tour_length = 0.0;
 
     for(int i=0; i < _n_cities; i++){
@@ -61,7 +61,7 @@ void Individual::_compute_fitness(const mat& coords) {
         // Last iteration of this loop closes the circle: city_idx_1 is the second-to-last city which is the last city before coming back to 1, city_idx_2 is the last city which is city 1
     }
 
-    _fitness = tour_length;
+    return tour_length;
 }
 
 
@@ -82,7 +82,7 @@ Individual::Individual(const vector<int>& idxs, const mat& coords) {
     }
 
     // Calculate the fitness using the provided coordinates
-    _compute_fitness(coords);
+    _fitness = _compute_fitness(coords);
 }
 
 double Individual::get_fitness() const { 

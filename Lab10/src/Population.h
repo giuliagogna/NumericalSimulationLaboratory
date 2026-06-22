@@ -51,6 +51,9 @@ public:
 
     // Save the entire population's fitness and individuals
     void SavePopulationLog(ofstream& out_file, int generation) const;
+
+    // Only save the necessary data
+    void SavePopulationLogSynth(ofstream& out_file, int generation) const;
 };
 
 #endif // POPULATION_H

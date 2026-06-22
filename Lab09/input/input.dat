@@ -1,5 +1,5 @@
 N_CITIES            34
-POP_SIZE            700
+POP_SIZE            100
 N_GENERATIONS       2000
 GENERATE_COORDS     False
 COORDS_TYPE         Italy

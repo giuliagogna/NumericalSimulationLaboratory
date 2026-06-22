@@ -61,7 +61,7 @@ int Population::Select() {
     double r = _rnd.Rannyu();
     double p = 3.0; // The exponent. p > 1 privileges lower indices (better fitness)
 
-    int j = floor(_pop_size * pow(r, p));
+    int j = static_cast<int>(_pop_size * pow(r, p));
 
     // To ensure the index is never out of bouds
     if(j >= _pop_size) { 
@@ -94,7 +94,7 @@ void Population::MutatePairPermutation(vector<int>& child_idxs) {
 
 // Shift of +n positions for m contiguous cities (except for the first city and m < N-1)
 void Population::MutateShift(vector<int>& child_idxs) {
-    // Shifts cities from index start_index to start_index + n_to_shift - 1 by shift_amount positions to the right (circularly)
+    // Shifts cities from index start_index to start_index + n_to_shift - 1 by amount_to_shift positions to the right (circularly)
     int start_index = static_cast<int>(_rnd.Rannyu(1, _n_cities - 1)); // Starting index of the block to shift
     int n_to_shift = static_cast<int>(_rnd.Rannyu(1, _n_cities - start_index)); // Number of cities to shift
 
@@ -223,8 +223,6 @@ void Population::EvolveOneGeneration(){
     // Always save the best element of the previous generation
     new_population.push_back(_pop[0]);
 
-    // Increment by two individual per cycle: crossover takes in two parents and produces two children, so at each iteration 
-    // I make two processings. At the end of the cycle _pop_size processings have been done
     // Loop until the new population is completely full
     while (new_population.size() < _pop_size) {
         

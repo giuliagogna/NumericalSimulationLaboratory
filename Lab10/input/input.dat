@@ -1,15 +1,18 @@
 N_CITIES            34
-POP_SIZE            1500
-N_GENERATIONS       1000
+POP_SIZE            700
+N_GENERATIONS       3000
 GENERATE_COORDS     False
 COORDS_TYPE         Italy
 N_MIGR              10
+USE_SYNTHETIC_LOG   1
 
 ENDINPUT
 
-Type of coordinates:
+Possible values for field COORDS_TYPE:
 - Circular: city coordinates uniformly distributed on a circumference
 - Square: city coordinates uniformly distributed inside a Square
+- Italy: this coord type is to use only with GENERATE_COORDS set to False. It reads the coordinates from the file "cap_prov_ita.dat" to calculate the route through the italian provinces.
 
-When GENERATE_COORDS is True, coordinates are generated according to a circumference or the inside of a square
-When GENERATE_COORDS is False, coordinates are read from a file chosen according to COORDS_TYPE. N_CITIES becomes irrelevant.
+When GENERATE_COORDS is True, coordinates are generated, if it is false, coordinates are read from a file and the content of N_CITIES is irrelevant. The content of COORDS_TYPE is used to read from the correct file.
+
+The flag USE_SYNTHETIC_LOG allows to choose between saving all the individuals in each generation (when set to 0), or only the absolute best tour for each generation (when set to 1). When set to 1, the information about generation, rank and fitness are still preserved. This flag should be kept to 1, since the information needed in the data analysis only regards the absolute best tour for each generation.
