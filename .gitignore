@@ -16,6 +16,7 @@ __pycache__/
 .vscode/
 .DS_Store
 Thumbs.db
+.idea/
 
 # Outputs
 Lab09/outputs/poplog_N110_Pop700_Gen2000_Italy.dat
