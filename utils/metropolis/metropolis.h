@@ -84,7 +84,7 @@ template <typename State, typename Distribution>
 class MetropolisAlgorithm {
 private:
     Distribution prob; // The distribution to sample from
-    double _step = 0.5;
+    double _step = 1.0;
     string _tentative_distr = "uniform";
     int _accepted_moves = 0;
 

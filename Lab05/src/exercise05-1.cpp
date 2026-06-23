@@ -101,20 +101,16 @@ int main() {
         MetropolisAlgorithm<Position, Psi100> metropolis100(psi_1s, pos1s, dist_type);
         MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p, dist_type);
 
-        // TUNING
+        // EQUILIBRATION
+        metropolis100.equilibrate(pos1s, n_equilibration_steps, rnd);
+        metropolis210.equilibrate(pos2p, n_equilibration_steps, rnd);
 
+        // TUNING
         metropolis100.tune_step(pos1s, rnd, 1.0);
         metropolis210.tune_step(pos2p, rnd, 1.5);
 
         outlog << "Optimal step found for Psi100 (" << dist_type << "): " << metropolis100.get_step() << endl;
         outlog << "Optimal step found for Psi210 (" << dist_type << "): " << metropolis210.get_step() << endl << endl;
-
-        // EQUILIBRATION
-        metropolis100.reset_position(pos1s);
-        metropolis210.reset_position(pos2p);
-
-        metropolis100.equilibrate(pos1s, n_equilibration_steps, rnd);
-        metropolis210.equilibrate(pos2p, n_equilibration_steps, rnd);
 
         // STARTING SIMULATION
         outlog << "Starting Metropolis..." << endl;

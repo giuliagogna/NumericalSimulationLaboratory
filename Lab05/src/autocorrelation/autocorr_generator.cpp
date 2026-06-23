@@ -37,28 +37,33 @@ int main() {
         OpenOutputFile(output_2p_r, filename2p);
         output_2p_r << "# r" << endl;
 
-        Position pos1s = {50.0, 50.0, 50.0};
-        Position pos2p = {50.0, 50.0, 50.0};
-
         cout << "================================================================" << endl;
         cout << "GENERATION OF AUTOCORRELATION DATA" << endl;
         cout << "================================================================" << endl << endl;
 
-        cout << "Initial position Psi100: { " << pos1s.x << ", " << pos1s.y << ", " << pos1s.z << " }" << endl;
-        cout << "Initial position Psi210: { " << pos1s.x << ", " << pos1s.y << ", " << pos1s.z << " }" << endl << endl;
+        // --------------------------------------------------------------------------------------------------
+        // Tuning phase near the orbital center to be in a zone where the function is sufficiently large
+        // --------------------------------------------------------------------------------------------------
+        Position pos1s_tune = {1.0, 1.0, 1.0};
+        Position pos2p_tune = {3.0, 3.0, 3.0};
         
         cout << "================================================================" << endl << endl;
 
         cout << "Using Psi100" << endl;
-        MetropolisAlgorithm<Position, Psi100> metropolis100(psi_1s, pos1s, dist_type);
-        metropolis100.tune_step(pos1s, rnd, 1.0);
-        metropolis100.reset_position(pos1s); 
+        MetropolisAlgorithm<Position, Psi100> metropolis100(psi_1s, pos1s_tune, dist_type);
+        metropolis100.tune_step(pos1s_tune, rnd, 1.0);
 
         cout << "Using Psi210" << endl;
-        MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p, dist_type);        
-        metropolis210.tune_step(pos2p, rnd, 1.0);
-        metropolis210.reset_position(pos2p);
+        MetropolisAlgorithm<Position, Psi210> metropolis210(psi_2p, pos2p_tune, dist_type);        
+        metropolis210.tune_step(pos2p_tune, rnd, 1.5);
 
+        // --------------------------------------------------------------------------------------------------
+        // Data collection: done afer the step has been tuned
+        // --------------------------------------------------------------------------------------------------
+
+        Position pos1s = {50.0, 50.0, 50.0};
+        Position pos2p = {50.0, 50.0, 50.0};
+        
         cout << "Generating raw data..." << endl;
         for(int i = 0; i < N_steps; i++) {
             metropolis100.perform_metropolis_move(pos1s, rnd);

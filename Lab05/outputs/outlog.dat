@@ -2,10 +2,10 @@
 
 
 === CONFIGURATION LOADED AUTOMATICALLY ===
- - Equilibration steps: 5210
- - Block Length (L):    12340
+ - Equilibration steps: 5100
+ - Block Length (L):    11930
  - Number of Blocks:    100
- - Total Steps (N):     1234000
+ - Total Steps (N):     1193000
 ==========================================
 
 
@@ -13,35 +13,36 @@
   Starting simulation with uniform distribution
 ==============================================================
 
+Starting equilibration phase ...
+Equilibration phase completed!
 
-Starting calibration for distribution: uniform
-
- =====   Tried step = 1.0000   ->   Acceptance =  57.50%   ======
- =====   Tried step = 1.1000   ->   Acceptance =  53.30%   ======
-
-Calibration completed! Step chosen = 1.10
+Starting equilibration phase ...
+Equilibration phase completed!
 
 
 Starting calibration for distribution: uniform
 
- =====   Tried step = 1.5000   ->   Acceptance =  72.64%   ======
- =====   Tried step = 1.6500   ->   Acceptance =  68.84%   ======
- =====   Tried step = 1.8150   ->   Acceptance =  67.27%   ======
- =====   Tried step = 1.9965   ->   Acceptance =  64.27%   ======
- =====   Tried step = 2.1962   ->   Acceptance =  60.91%   ======
- =====   Tried step = 2.4158   ->   Acceptance =  58.07%   ======
- =====   Tried step = 2.6573   ->   Acceptance =  53.78%   ======
+ =====   Tried step = 1.0000   ->   Acceptance =  56.99%   ======
+ =====   Tried step = 1.1000   ->   Acceptance =  55.57%   ======
+ =====   Tried step = 1.2100   ->   Acceptance =  49.00%   ======
+
+Calibration completed! Step chosen = 1.21
+
+
+Starting calibration for distribution: uniform
+
+ =====   Tried step = 1.5000   ->   Acceptance =  71.60%   ======
+ =====   Tried step = 1.6500   ->   Acceptance =  69.93%   ======
+ =====   Tried step = 1.8150   ->   Acceptance =  66.17%   ======
+ =====   Tried step = 1.9965   ->   Acceptance =  64.15%   ======
+ =====   Tried step = 2.1962   ->   Acceptance =  61.61%   ======
+ =====   Tried step = 2.4158   ->   Acceptance =  56.57%   ======
+ =====   Tried step = 2.6573   ->   Acceptance =  54.77%   ======
 
 Calibration completed! Step chosen = 2.66
 
-Optimal step found for Psi100 (uniform): 1.1
+Optimal step found for Psi100 (uniform): 1.21
 Optimal step found for Psi210 (uniform): 2.65734
-
-Starting equilibration phase ...
-Equilibration phase completed!
-
-Starting equilibration phase ...
-Equilibration phase completed!
 
 Starting Metropolis...
 Metropolis completed for uniform distribution.
@@ -50,31 +51,31 @@ Metropolis completed for uniform distribution.
   Starting simulation with gaussian distribution
 ==============================================================
 
+Starting equilibration phase ...
+Equilibration phase completed!
+
+Starting equilibration phase ...
+Equilibration phase completed!
+
 
 Starting calibration for distribution: gaussian
 
- =====   Tried step = 1.0000   ->   Acceptance =  40.16%   ======
- =====   Tried step = 0.9000   ->   Acceptance =  43.50%   ======
- =====   Tried step = 0.8100   ->   Acceptance =  46.43%   ======
+ =====   Tried step = 1.0000   ->   Acceptance =  39.08%   ======
+ =====   Tried step = 0.9000   ->   Acceptance =  44.50%   ======
+ =====   Tried step = 0.8100   ->   Acceptance =  48.58%   ======
 
 Calibration completed! Step chosen = 0.81
 
 
 Starting calibration for distribution: gaussian
 
- =====   Tried step = 1.5000   ->   Acceptance =  57.16%   ======
- =====   Tried step = 1.6500   ->   Acceptance =  53.63%   ======
+ =====   Tried step = 1.5000   ->   Acceptance =  57.61%   ======
+ =====   Tried step = 1.6500   ->   Acceptance =  54.75%   ======
 
 Calibration completed! Step chosen = 1.65
 
 Optimal step found for Psi100 (gaussian): 0.81
 Optimal step found for Psi210 (gaussian): 1.65
-
-Starting equilibration phase ...
-Equilibration phase completed!
-
-Starting equilibration phase ...
-Equilibration phase completed!
 
 Starting Metropolis...
 Metropolis completed for gaussian distribution.

@@ -2,17 +2,14 @@
 GENERATION OF AUTOCORRELATION DATA
 ================================================================
 
-Initial position Psi100: { 50, 50, 50 }
-Initial position Psi210: { 50, 50, 50 }
-
 ================================================================
 
 Using Psi100
 
 Starting calibration for distribution: uniform
 
- =====   Tried step = 1.0000   ->   Acceptance =  58.45%   ======
- =====   Tried step = 1.1000   ->   Acceptance =  53.90%   ======
+ =====   Tried step = 1.0000   ->   Acceptance =  57.50%   ======
+ =====   Tried step = 1.1000   ->   Acceptance =  53.30%   ======
 
 Calibration completed! Step chosen = 1.10
 
@@ -20,19 +17,15 @@ Using Psi210
 
 Starting calibration for distribution: uniform
 
- =====   Tried step = 1.0000   ->   Acceptance =  80.93%   ======
- =====   Tried step = 1.1000   ->   Acceptance =  78.30%   ======
- =====   Tried step = 1.2100   ->   Acceptance =  76.18%   ======
- =====   Tried step = 1.3310   ->   Acceptance =  74.20%   ======
- =====   Tried step = 1.4641   ->   Acceptance =  71.51%   ======
- =====   Tried step = 1.6105   ->   Acceptance =  70.44%   ======
- =====   Tried step = 1.7716   ->   Acceptance =  67.08%   ======
- =====   Tried step = 1.9487   ->   Acceptance =  63.49%   ======
- =====   Tried step = 2.1436   ->   Acceptance =  60.64%   ======
- =====   Tried step = 2.3579   ->   Acceptance =  58.57%   ======
- =====   Tried step = 2.5937   ->   Acceptance =  54.38%   ======
+ =====   Tried step = 1.5000   ->   Acceptance =  72.30%   ======
+ =====   Tried step = 1.6500   ->   Acceptance =  68.48%   ======
+ =====   Tried step = 1.8150   ->   Acceptance =  66.51%   ======
+ =====   Tried step = 1.9965   ->   Acceptance =  63.69%   ======
+ =====   Tried step = 2.1962   ->   Acceptance =  60.36%   ======
+ =====   Tried step = 2.4158   ->   Acceptance =  58.14%   ======
+ =====   Tried step = 2.6573   ->   Acceptance =  54.03%   ======
 
-Calibration completed! Step chosen = 2.59
+Calibration completed! Step chosen = 2.66
 
 Generating raw data...
 Data saved in autocorr/autocorr_r100_U.dat, autocorr/autocorr_r210_U.dat
@@ -41,18 +34,15 @@ Data saved in autocorr/autocorr_r100_U.dat, autocorr/autocorr_r210_U.dat
 GENERATION OF AUTOCORRELATION DATA
 ================================================================
 
-Initial position Psi100: { 50.00, 50.00, 50.00 }
-Initial position Psi210: { 50.00, 50.00, 50.00 }
-
 ================================================================
 
 Using Psi100
 
 Starting calibration for distribution: gaussian
 
- =====   Tried step = 1.0000   ->   Acceptance =  39.85%   ======
- =====   Tried step = 0.9000   ->   Acceptance =  43.82%   ======
- =====   Tried step = 0.8100   ->   Acceptance =  48.50%   ======
+ =====   Tried step = 1.0000   ->   Acceptance =  39.79%   ======
+ =====   Tried step = 0.9000   ->   Acceptance =  43.25%   ======
+ =====   Tried step = 0.8100   ->   Acceptance =  48.99%   ======
 
 Calibration completed! Step chosen = 0.81
 
@@ -60,15 +50,10 @@ Using Psi210
 
 Starting calibration for distribution: gaussian
 
- =====   Tried step = 1.0000   ->   Acceptance =  69.21%   ======
- =====   Tried step = 1.1000   ->   Acceptance =  66.67%   ======
- =====   Tried step = 1.2100   ->   Acceptance =  63.83%   ======
- =====   Tried step = 1.3310   ->   Acceptance =  61.12%   ======
- =====   Tried step = 1.4641   ->   Acceptance =  58.77%   ======
- =====   Tried step = 1.6105   ->   Acceptance =  56.02%   ======
- =====   Tried step = 1.7716   ->   Acceptance =  52.98%   ======
+ =====   Tried step = 1.5000   ->   Acceptance =  58.10%   ======
+ =====   Tried step = 1.6500   ->   Acceptance =  54.41%   ======
 
-Calibration completed! Step chosen = 1.77
+Calibration completed! Step chosen = 1.65
 
 Generating raw data...
 Data saved in autocorr/autocorr_r100_G.dat, autocorr/autocorr_r210_G.dat
@@ -84,12 +69,12 @@ Running 'autocorr_generator.cpp'...
 
 Analysis for burnin and autocorrelation time
  -> Thermalization found at index:
-        - 1s U: 521 steps
-        - 2p U: 277 steps
-        - 1s G: 361 steps
-        - 2p G: 203 steps
+        - 1s U: 510 steps
+        - 2p U: 237 steps
+        - 1s G: 400 steps
+        - 2p G: 257 steps
 
- -> Worst case burn-in: 521 steps
+ -> Worst case burn-in: 510 steps
 
 Generating equilibration plots...
 Equilibration plots saved!
@@ -97,9 +82,9 @@ Equilibration plots saved!
 
 Exponential Fit Results for Correlation Times:
 ============================================================
-[1s state (Uniform)] -> Estimated tau_c: 12.3 steps
-[2p state (Uniform)] -> Estimated tau_c: 11.4 steps
-[1s state (Gaussian)] -> Estimated tau_c: 10.6 steps
-[2p state (Gaussian)] -> Estimated tau_c: 10.8 steps
+[1s state (Uniform)] -> Estimated tau_c: 11.9 steps
+[2p state (Uniform)] -> Estimated tau_c: 11.0 steps
+[1s state (Gaussian)] -> Estimated tau_c: 10.7 steps
+[2p state (Gaussian)] -> Estimated tau_c: 11.3 steps
 ============================================================ 
 
