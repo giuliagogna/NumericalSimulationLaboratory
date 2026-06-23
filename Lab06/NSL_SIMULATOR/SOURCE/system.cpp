@@ -95,10 +95,10 @@ void System :: move(int i){ // Propose a MC move for particle i
     int right_spin = _particle(this->pbc(i+1)).getspin();
 
     // Calculate the energy difference between the state with spin si=-1 and the state with spin si=+1
-    double delta_E_minus_to_plus = 2.0 * (_J * (left_spin + right_spin) + _H);
+    double delta_E_plus_to_minus = 2.0 * (_J * (left_spin + right_spin) + _H);
 
     // Conditional probability of spin i being +1 given the states of its neighbors
-    double p_plus = 1.0 / (1.0 + exp(-(_beta) * delta_E_minus_to_plus));
+    double p_plus = 1.0 / (1.0 + exp(-(_beta) * delta_E_plus_to_minus));
 
     double r = _rnd.Rannyu();
 
