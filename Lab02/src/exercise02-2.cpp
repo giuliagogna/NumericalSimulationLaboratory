@@ -57,6 +57,8 @@ int main(){
             double r_rms_lat = sqrt(block_sum_lattice[step] / L);
             double r_rms_cont = sqrt(block_sum_continuous[step] / L);
 
+            // The completed number of blocks at this point is i + 1 (I completed the block but
+            // not yet updated i)
             prog_lattice[step] = (double(i)/(i+1)) * prog_lattice[step] + r_rms_lat/(i+1);
             prog_lattice_squared[step] = (double(i)/(i+1)) * prog_lattice_squared[step] + (r_rms_lat * r_rms_lat)/(i+1);
 
