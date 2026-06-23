@@ -14,10 +14,10 @@ int main(){
 
     // Setting the parameters for the Buffon experiment
 
-    double d = 10;   // Distance between the lines
-    double l = 5;    // Length of the needle
-    int N = 100;     // Number of blocks
-    int L = 10000;   // Number of throws for the calculation in each block
+    double d = 10;          // Distance between the lines
+    double l = 5;           // Length of the needle
+    int N = 100;            // Number of blocks
+    int N_throws = 10000;   // Number of throws for the calculation in each block
 
     ofstream pi_values;
     OpenOutputFile(pi_values, "01_3_pi_estimate.dat");
@@ -42,7 +42,7 @@ int main(){
 
         int count_crossed = 0; // Counter for the number of times the needle crosses a line
 
-        for (int j = 0; j < L; j++){ // Loop over the throws
+        for (int j = 0; j < N_throws; j++){ // Loop over the throws
 
             double d_centre = rnd.Rannyu(0, d/2.0); // Distance of the centre of the needle from the closest line
 
@@ -65,11 +65,11 @@ int main(){
         }
 
         // Estimating pi in the current block
-        double pi_block = (2.0 * l * L) / (d * count_crossed);
+        double pi_block = (2.0 * l * N_throws) / (d * count_crossed);
         blocker.add_measurement(pi_block);
 
         // Since the internal block size is 1, a block is completed immediately
-        pi_values << (i + 1) * L << " "
+        pi_values << (i + 1) * N_throws << " "
                   << blocker.get_completed_blocks() << " "
                   << blocker.get_mean() << " " 
                   << blocker.get_error()
