@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <filesystem>
 
 #include "functions.h"
 #include "../random/random.h"
@@ -67,12 +68,16 @@ void InitializeMPI_Generator(Random& rnd, int rank) {
 // This function opens an output file in the "outputs" directory, creating the directory if it does not exist
 void OpenOutputFile(ofstream& output_file, const string& filename) {
 
+    namespace fs = std::filesystem;
+    
+    fs::path output_dir = "outputs";
+
     // If there is no "outputs" directory, create it to store the output files
-    if (!std::filesystem::exists("outputs")) {
-        std::filesystem::create_directory("outputs");
+    if (!fs::exists(output_dir)) {
+        fs::create_directory(output_dir);
     }
     
-    string filepath = "outputs/" + string(filename);
+    fs::path filepath = output_dir / filename;
     
     output_file.open(filepath);
     
