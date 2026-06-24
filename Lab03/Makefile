@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -O3 --std=c++17
+CFLAGS = -Wall -O2 --std=c++17
 BUILD = .build
 
 # Main target: create the hidden directory first, then compile all executables
@@ -12,7 +12,7 @@ $(BUILD):
 
 # Exercise 1
 $(BUILD)/exercise03_1.exe : $(BUILD)/exercise03_1.o $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_1.o -o $(BUILD)/exercise03_1.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_1.o -o $(BUILD)/exercise03_1.exe $(CFLAGS)
 
 $(BUILD)/exercise03_1.o : src/exercise03_1.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise03_1.cpp -o $(BUILD)/exercise03_1.o $(CFLAGS)
@@ -20,7 +20,7 @@ $(BUILD)/exercise03_1.o : src/exercise03_1.cpp ../utils/data_blocking/data_block
 
 # Exercise 2
 $(BUILD)/exercise03_2.exe : $(BUILD)/exercise03_2.o $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_2.o -o $(BUILD)/exercise03_2.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/pricing_options.o $(BUILD)/exercise03_2.o -o $(BUILD)/exercise03_2.exe $(CFLAGS)
 
 $(BUILD)/exercise03_2.o : src/exercise03_2.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise03_2.cpp -o $(BUILD)/exercise03_2.o $(CFLAGS)

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <iomanip>
 
 #include "../random/random.h"
 #include "../auxiliary_functions/functions.h"

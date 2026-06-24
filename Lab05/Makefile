@@ -12,7 +12,7 @@ $(BUILD):
 
 # Exercise 1
 $(BUILD)/exercise05-1.exe : $(BUILD)/exercise05-1.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise05-1.o -o $(BUILD)/exercise05-1.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise05-1.o -o $(BUILD)/exercise05-1.exe $(CFLAGS)
 
 $(BUILD)/exercise05-1.o : src/exercise05-1.cpp ../utils/metropolis/metropolis.h ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise05-1.cpp -o $(BUILD)/exercise05-1.o $(CFLAGS)
@@ -21,7 +21,7 @@ $(BUILD)/exercise05-1.o : src/exercise05-1.cpp ../utils/metropolis/metropolis.h 
 # Autocorrelation Generator
 # ========================================================
 $(BUILD)/autocorr_generator.exe : $(BUILD)/autocorr_generator.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/autocorr_generator.o -o $(BUILD)/autocorr_generator.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/autocorr_generator.o -o $(BUILD)/autocorr_generator.exe $(CFLAGS)
 
 $(BUILD)/autocorr_generator.o : src/autocorrelation/autocorr_generator.cpp ../utils/metropolis/metropolis.h
 	$(CC) -c src/autocorrelation/autocorr_generator.cpp -o $(BUILD)/autocorr_generator.o $(CFLAGS)

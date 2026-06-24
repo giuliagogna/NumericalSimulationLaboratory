@@ -10,14 +10,14 @@ $(BUILD):
 
 # Optimize Executable
 $(BUILD)/optimize.exe : $(BUILD)/optimize.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/optimize.o -o $(BUILD)/optimize.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/optimize.o -o $(BUILD)/optimize.exe $(CFLAGS)
 
 $(BUILD)/optimize.o : src/optimize.cpp src/simulated_annealing.h | $(BUILD)
 	$(CC) -c src/optimize.cpp -o $(BUILD)/optimize.o $(CFLAGS)
 
 # Production Executable
 $(BUILD)/production.exe : $(BUILD)/production.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/production.o -o $(BUILD)/production.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/production.o -o $(BUILD)/production.exe $(CFLAGS)
 
 $(BUILD)/production.o : src/production.cpp src/simulated_annealing.h | $(BUILD)
 	$(CC) -c src/production.cpp -o $(BUILD)/production.o $(CFLAGS)

@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O3 --std=c++14 -I/opt/homebrew/include
+CFLAGS = -O2 --std=c++14 -I/opt/homebrew/include
 AFLAGS = -L/opt/homebrew/lib -larmadillo
 
 all: simulator.exe
