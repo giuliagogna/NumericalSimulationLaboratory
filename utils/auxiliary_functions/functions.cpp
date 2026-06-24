@@ -64,7 +64,6 @@ void InitializeMPI_Generator(Random& rnd, int rank) {
     }
 }
 
-#include <cstdlib> // Aggiungi questo per usare system()
 
 // This function opens an output file in the "outputs" directory, creating the directory if it does not exist
 void OpenOutputFile(ofstream& output_file, const string& filename) {
