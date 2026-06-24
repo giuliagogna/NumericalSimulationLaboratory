@@ -145,7 +145,7 @@ public:
         return _tentative_distr;
     }
 
-    string set_tentative_distr(string distr){
+    void set_tentative_distr(string distr){
         _tentative_distr = distr;
     }
 

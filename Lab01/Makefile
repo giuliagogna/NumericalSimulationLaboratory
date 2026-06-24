@@ -12,7 +12,7 @@ $(BUILD):
 
 # Exercise 1
 $(BUILD)/exercise01-1.exe : $(BUILD)/exercise01-1.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-1.o -o $(BUILD)/exercise01-1.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-1.o -o $(BUILD)/exercise01-1.exe $(CFLAGS)
 
 $(BUILD)/exercise01-1.o : src/exercise01-1.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise01-1.cpp -o $(BUILD)/exercise01-1.o $(CFLAGS)
@@ -20,7 +20,7 @@ $(BUILD)/exercise01-1.o : src/exercise01-1.cpp ../utils/data_blocking/data_block
 
 # Exercise 2
 $(BUILD)/exercise01-2.exe : $(BUILD)/exercise01-2.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-2.o -o $(BUILD)/exercise01-2.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-2.o -o $(BUILD)/exercise01-2.exe $(CFLAGS)
 
 $(BUILD)/exercise01-2.o : src/exercise01-2.cpp
 	$(CC) -c src/exercise01-2.cpp -o $(BUILD)/exercise01-2.o $(CFLAGS)
@@ -28,7 +28,7 @@ $(BUILD)/exercise01-2.o : src/exercise01-2.cpp
 
 # Exercise 3
 $(BUILD)/exercise01-3.exe : $(BUILD)/exercise01-3.o $(BUILD)/random.o $(BUILD)/functions.o
-	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-3.o -o $(BUILD)/exercise01-3.exe
+	$(CC) $(BUILD)/random.o $(BUILD)/functions.o $(BUILD)/exercise01-3.o -o $(BUILD)/exercise01-3.exe $(CFLAGS)
 
 $(BUILD)/exercise01-3.o : src/exercise01-3.cpp ../utils/data_blocking/data_blocking.h
 	$(CC) -c src/exercise01-3.cpp -o $(BUILD)/exercise01-3.o $(CFLAGS)

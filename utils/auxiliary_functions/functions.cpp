@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <filesystem>
+#include <cstdlib>
 
 #include "functions.h"
 #include "../random/random.h"
@@ -65,19 +65,14 @@ void InitializeMPI_Generator(Random& rnd, int rank) {
     }
 }
 
+#include <cstdlib> // Aggiungi questo per usare system()
+
 // This function opens an output file in the "outputs" directory, creating the directory if it does not exist
 void OpenOutputFile(ofstream& output_file, const string& filename) {
 
-    namespace fs = std::filesystem;
+    system("mkdir -p outputs");
     
-    fs::path output_dir = "outputs";
-
-    // If there is no "outputs" directory, create it to store the output files
-    if (!fs::exists(output_dir)) {
-        fs::create_directory(output_dir);
-    }
-    
-    fs::path filepath = output_dir / filename;
+    string filepath = "outputs/" + filename;
     
     output_file.open(filepath);
     

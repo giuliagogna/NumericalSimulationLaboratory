@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -O3 --std=c++17
+CFLAGS = -Wall -O2 --std=c++17
 BUILD = .build
 
 # Main target: create the hidden directory first, then compile all executables
