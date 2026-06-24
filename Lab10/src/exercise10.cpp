@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <armadillo>
-#include <filesystem>
+#include <cstdlib>
 
 #include "Individual.h"
 #include "Population.h"
@@ -182,14 +182,9 @@ int main(int argc, char* argv[]) {
 
         // Cleanup: delete all "poplog_" FILES
         cout << "Cleaning up legacy poplog files..." << endl;
-        for (const auto& entry : std::filesystem::directory_iterator("outputs")) {
-            std::string current_file = entry.path().filename().string();
-            
-            // If the filename starts with "poplog_", delete it
-            if (current_file.find("poplog_") == 0) {
-                std::filesystem::remove(entry.path());
-            }
-        }
+    
+        system("rm -f outputs/poplog_*");
+        
         cout << "Cleanup complete. Workspace is clean." << endl;
 
     } else if (rank == global_champ_rank) {

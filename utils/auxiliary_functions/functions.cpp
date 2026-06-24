@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <cstdlib>
 
 #include "functions.h"
 #include "../random/random.h"

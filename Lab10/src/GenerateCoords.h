@@ -9,6 +9,7 @@
 #include <armadillo>
 #include <cstdlib>
 #include <string>
+#include <iomanip>
 #include "../../utils/random/random.h"
 #include "../../utils/auxiliary_functions/functions.h"
 
